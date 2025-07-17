@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, FlatList, ScrollView } from "react-native";
+import React, { useContext, useEffect, useState, useCallback } from "react";
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, RefreshControl } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Progress from 'react-native-progress'; // Importamos la librería
+import * as Progress from 'react-native-progress';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -11,13 +11,39 @@ const ProfileScreen = () => {
   const auth = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Estado para el progreso
+  const [refreshing, setRefreshing] = useState(false);
   const [progress, setProgress] = useState<any[]>([]);
   const [progressLoading, setProgressLoading] = useState(true);
   const [totalPuntaje, setTotalPuntaje] = useState<number>(0);
 
-  // Simulación de carga de datos del usuario
+  const loadData = useCallback(async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!auth?.user || !token) {
+        setProgressLoading(false);
+        return;
+      }
+
+      const response = await axios.get(
+        `${apiUrl}/progreso/progreso/${auth.user.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setProgress(response.data);
+
+      const resumenResponse = await axios.get(
+        `${apiUrl}/progreso/${auth.user.id}/resumen`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTotalPuntaje(resumenResponse.data.totalPuntaje);
+
+    } catch (err: any) {
+      console.error("Error al cargar el progreso:", err?.response?.data || err.message);
+    } finally {
+      setProgressLoading(false);
+      setRefreshing(false);
+    }
+  }, [auth?.user]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (auth?.user) {
@@ -31,39 +57,14 @@ const ProfileScreen = () => {
     return () => clearTimeout(timer);
   }, [auth?.user]);
 
-  // Cargar el progreso del usuario
   useEffect(() => {
-    const fetchProgress = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!auth?.user || !token) {
-          setProgressLoading(false);
-          return;
-        }
+    loadData();
+  }, [loadData]);
 
-        // Obtener el progreso de las tareas completadas por el usuario
-        const response = await axios.get(
-          `${apiUrl}/progreso/progreso/${auth.user.id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setProgress(response.data); // Establecemos el progreso del usuario
-
-        // Llamamos al endpoint para obtener el resumen del progreso
-        const resumenResponse = await axios.get(
-          `${apiUrl}/progreso/${auth.user.id}/resumen`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setTotalPuntaje(resumenResponse.data.totalPuntaje); // Establecemos el puntaje total
-
-      } catch (err: any) {
-        console.error("Error al cargar el progreso:", err?.response?.data || err.message);
-      } finally {
-        setProgressLoading(false);
-      }
-    };
-
-    fetchProgress();
-  }, [auth?.user]);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadData();
+  }, [loadData]);
 
   if (loading) {
     return (
@@ -82,60 +83,69 @@ const ProfileScreen = () => {
     );
   }
 
-  // Calculamos el porcentaje de progreso, suponiendo un puntaje máximo de 100
   const progressPercentage = totalPuntaje / 100;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.profileSection}>
-        <Text style={styles.title}>Perfil</Text>
-        {auth?.user ? (
-          <>
-            <Text style={styles.text}>Nombre: {auth.user.username}</Text>
-            <Text style={styles.text}>Correo: {auth.user.email}</Text>
-          </>
-        ) : (
-          <Text style={styles.text}>No hay usuario autenticado.</Text>
-        )}
-      </View>
+    <FlatList
+      data={progress}
+      keyExtractor={(item) => item._id}
+      renderItem={({ item }) => (
+        <View style={styles.progressItem}>
+          <Text style={styles.text}>Tarea: {item.id_tarea?.pregunta || "Sin título"}</Text>
+          <Text style={styles.text}>Puntaje: {item.puntaje}</Text>
+          <Text style={styles.text}>
+            Fecha: {new Date(item.fecha_progreso).toLocaleString()}
+          </Text>
+        </View>
+      )}
+      ListHeaderComponent={
+        <View style={styles.container}>
+          {/* Sección de Perfil */}
+          <View style={styles.profileSection}>
+            <Text style={styles.title}>Perfil</Text>
+            {auth?.user ? (
+              <>
+                <Text style={styles.text}>Nombre: {auth.user.username}</Text>
+                <Text style={styles.text}>Correo: {auth.user.email}</Text>
+              </>
+            ) : (
+              <Text style={styles.text}>No hay usuario autenticado.</Text>
+            )}
+          </View>
 
-      <View style={{ marginTop: 30, width: "100%" }}>
-        <Text style={styles.title}>Mi Progreso</Text>
-        {progressLoading ? (
-          <ActivityIndicator size="large" color="dodgerblue" />
-        ) : progress.length === 0 ? (
-          <Text style={styles.text}>No tienes progreso registrado.</Text>
-        ) : (
-          <>
-            {/* Barra de progreso */}
-            <Text style={styles.text}>Puntaje Total: {totalPuntaje} / 100</Text>
-            <Progress.Bar
-              progress={progressPercentage}
-              width={null}
-              height={20}
-              color="dodgerblue"
-              borderWidth={0}
-              style={styles.progressBar}
-            />
-            {/* Lista de tareas completadas */}
-            <FlatList
-              data={progress}
-              keyExtractor={(item) => item._id}
-              renderItem={({ item }) => (
-                <View style={styles.progressItem}>
-                  <Text style={styles.text}>Tarea: {item.id_tarea?.pregunta || "Sin título"}</Text>
-                  <Text style={styles.text}>Puntaje: {item.puntaje}</Text>
-                  <Text style={styles.text}>
-                    Fecha: {new Date(item.fecha_progreso).toLocaleString()}
-                  </Text>
-                </View>
-              )}
-              contentContainerStyle={styles.flatListContainer} // Centra el contenido
-            />
-          </>
-        )}
-      </View>
-    </ScrollView>
+          {/* Sección de Progreso */}
+          <View style={{ marginTop: 30, width: "100%" }}>
+            <Text style={styles.title}>Mi Progreso</Text>
+            {progressLoading ? (
+              <ActivityIndicator size="large" color="dodgerblue" />
+            ) : progress.length === 0 ? (
+              <Text style={styles.text}>No tienes progreso registrado.</Text>
+            ) : (
+              <>
+                <Text style={styles.text}>Puntaje Total: {totalPuntaje} / 100</Text>
+                <Progress.Bar
+                  progress={progressPercentage}
+                  width={null}
+                  height={20}
+                  color="dodgerblue"
+                  borderWidth={0}
+                  style={styles.progressBar}
+                />
+              </>
+            )}
+          </View>
+        </View>
+      }
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={["dodgerblue"]}
+          tintColor="dodgerblue"
+        />
+      }
+      contentContainerStyle={styles.flatListContainer}
+    />
   );
 };
 
@@ -155,8 +165,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    alignItems: "center", // Centra el contenido del perfil
-    justifyContent: "center", // Centra el contenido del perfil
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 24,
@@ -187,7 +197,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   flatListContainer: {
-    paddingBottom: 20, // Para dejar espacio al final de la lista
+    paddingBottom: 20,
   },
 });
 

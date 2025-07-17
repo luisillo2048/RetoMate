@@ -1,14 +1,20 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,TouchableOpacity,ScrollView,Image,Alert,} from "react-native";
+import {View,Text,TextInput,TouchableOpacity,ScrollView,Image,Alert} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../context/ThemeContext";
-import { useRouter } from "expo-router";
 import { registerUser } from "../api/auth";
 import styles from "../themes/RegisterStyles";
 
+// Tipos para TypeScript (opcional pero recomendado)
+type RootStackParamList = {
+  Login: undefined;
+  // Agrega otras rutas aquí según sea necesario
+};
+
 const RegisterScreen = () => {
   const { theme } = useTheme();
-  const router = useRouter();
+  const navigation = useNavigation();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +34,7 @@ const RegisterScreen = () => {
     try {
       await registerUser(username, email, password);
       Alert.alert("Éxito", "Registro exitoso. Ahora puedes iniciar sesión.");
-      router.push("/auth/login");
+      navigation.navigate("Login");
     } catch (error: any) {
       const msg = error.response?.data?.message || "No se pudo registrar. Inténtalo de nuevo.";
       Alert.alert("Error", msg);
@@ -85,11 +91,12 @@ const RegisterScreen = () => {
               style={styles.icon}
             />
             <TextInput
-              placeholder="Correo"
+              placeholder="Correo electrónico"
               placeholderTextColor="#666"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
+              keyboardType="email-address"
               style={styles.input}
             />
           </View>
@@ -129,7 +136,7 @@ const RegisterScreen = () => {
           </View>
 
           <TouchableOpacity onPress={handleRegister} style={styles.button}>
-            <Text style={styles.buttonText}>Registro</Text>
+            <Text style={styles.buttonText}>Registrarse</Text>
             <MaterialCommunityIcons
               name="star-four-points"
               size={24}
@@ -141,7 +148,7 @@ const RegisterScreen = () => {
 
         <View style={styles.switchContainer}>
           <Text style={styles.switchText}>¿Ya tienes una cuenta?</Text>
-          <TouchableOpacity onPress={() => router.push("/auth/login")}>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text style={styles.switchLink}>¡Inicia sesión!</Text>
           </TouchableOpacity>
         </View>

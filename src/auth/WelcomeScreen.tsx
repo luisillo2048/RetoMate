@@ -14,16 +14,16 @@ const WelcomeScreen = () => {
 
   const handleStart = () => {
     if (user) {
-      navigation.replace("Home"); // Ya está logueado, lo mandamos directo al menú principal
+      navigation.replace("Home"); 
     } else {
-      navigation.navigate("Login"); // No hay sesión activa, lo mandamos al login
+      navigation.navigate("Login"); 
     }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <Ionicons name={"happy-outline"} size={80} color="white" />
+        <Image source={require('../../assets/images/logo2.png')} style={styles.image} />
       </View>
 
       <Text style={styles.title}>¡Matemáticas Divertidas!</Text>

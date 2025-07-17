@@ -20,6 +20,7 @@ export default function GamesScreen() {
   const [loading, setLoading] = useState(false);
   const [tareasCompletadas, setTareasCompletadas] = useState(false);
   const [mostrarRespuesta, setMostrarRespuesta] = useState(false);
+  const [bloquearOpciones, setBloquearOpciones] = useState(false);
 
   useEffect(() => {
     if (tarea) {
@@ -30,6 +31,7 @@ export default function GamesScreen() {
         setRespondido(false);
         setCorrecta(false);
         setMostrarRespuesta(false);
+        setBloquearOpciones(false);
       } catch (error) {
         console.error('Error al interpretar la tarea:', error);
         navigation.goBack();
@@ -38,10 +40,11 @@ export default function GamesScreen() {
   }, [tarea]);
 
   const verificarRespuesta = (opcion) => {
-    if (!tareaObj) return;
+    if (!tareaObj || bloquearOpciones) return;
     
     setLoading(true);
     setSelected(opcion);
+    setBloquearOpciones(true);
 
     setTimeout(async () => {
       try {
@@ -55,49 +58,53 @@ export default function GamesScreen() {
         setLoading(false);
 
         if (esCorrecta) {
-          await saveProgress(opcion);
+          // No guardamos el progreso hasta que presione Continuar
         }
       } catch (error) {
         console.error('Error al verificar respuesta:', error);
         setLoading(false);
+        setBloquearOpciones(false);
       }
     }, 1000);
   };
 
-  const saveProgress = async (respuestaUsuario) => {
+  const handleContinuar = async () => {
+    if (!tareaObj) return;
+    
+    setLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
-      if (!token || !tareaObj?._id) return;
+      if (token && tareaObj?._id) {
+        const response = await axios.post(
+          `${apiUrl}/tarea/${tareaObj._id}/responder`,
+          { respuesta: selected, correcta },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-      const response = await axios.post(
-        `${apiUrl}/tarea/${tareaObj._id}/responder`,
-        { respuesta: respuestaUsuario },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+        const { siguiente_tarea, bloque_completado } = response.data;
 
-      const { siguiente_tarea, bloque_completado } = response.data;
-
-      if (siguiente_tarea) {
-        setTareaObj(siguiente_tarea);
-      } else if (bloque_completado) {
-        setTareasCompletadas(true);
-      } else {
-        navigation.navigate('Tasks', { refresh: Date.now() });
+        if (siguiente_tarea) {
+          setTareaObj(siguiente_tarea);
+        } else if (bloque_completado) {
+          setTareasCompletadas(true);
+        } else {
+          navigation.navigate('Tasks', { refresh: Date.now() });
+        }
       }
     } catch (error) {
       console.error('Error al guardar progreso:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
     
-    // Si la imagen ya es una URL completa (http/https)
     if (/^https?:\/\//i.test(imagePath)) {
       return imagePath;
     }
     
-    // Si la imagen es una ruta relativa, construir la URL completa
     const baseUrl = apiUrl.startsWith('http') ? apiUrl : `https://${apiUrl}`;
     return `${baseUrl}/${imagePath.replace(/^\//, '')}`;
   };
@@ -131,7 +138,6 @@ export default function GamesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Mostrar la imagen si existe */}
       {imageUrl && (
         <Image 
           source={{ uri: imageUrl }} 
@@ -160,7 +166,7 @@ export default function GamesScreen() {
           <TouchableOpacity
             key={index}
             style={[styles.optionButton, { backgroundColor }]}
-            disabled={respondido || loading}
+            disabled={respondido || loading || bloquearOpciones}
             onPress={() => verificarRespuesta(opcion)}
           >
             <Text style={styles.optionText}>{opcion}</Text>
@@ -180,19 +186,14 @@ export default function GamesScreen() {
           <Text style={styles.feedbackText}>
             {correcta ? '¡Correcto! 🎉' : 'Incorrecto 😕'}
           </Text>
-          {correcta && (
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={() => {
-                setSelected(null);
-                setRespondido(false);
-                setCorrecta(false);
-                setMostrarRespuesta(false);
-              }}
-            >
-              <Text style={styles.nextButtonText}>Continuar</Text>
-            </TouchableOpacity>
-          )}
+          
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={handleContinuar}
+            disabled={loading}
+          >
+            <Text style={styles.nextButtonText}>Continuar</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -239,6 +240,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginTop: 10,
     color: '#555',
+    textAlign: 'center',
   },
   nextButton: {
     backgroundColor: '#8B5CF6',

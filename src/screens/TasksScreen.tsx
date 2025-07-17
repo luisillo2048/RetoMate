@@ -87,7 +87,7 @@ const TasksScreen = () => {
     setBloquesDesbloqueados(nuevosDesbloqueados);
   }, [progreso, tareasPorBloque]);
 
-  // Resto del código se mantiene igual...
+ 
   const toggleBloque = (bloque: number) => {
     setBloqueActivo(bloqueActivo === bloque ? null : bloque);
   };
@@ -199,18 +199,66 @@ const TasksScreen = () => {
   );
 };
 
-// Estilos se mantienen exactamente igual
+
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#FFF8F0' },
-  titulo: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: '#4B3F2F', textAlign: 'center' },
-  bloqueContainer: { marginBottom: 16, backgroundColor: '#FFF', borderRadius: 12, padding: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 3 },
-  bloqueBoton: { padding: 12, borderRadius: 8, alignItems: 'center' },
-  bloqueTitulo: { fontSize: 18, fontWeight: 'bold', color: '#4B3F2F' },
-  tareaContainer: { backgroundColor: '#F7E9D7', padding: 12, borderRadius: 8, marginTop: 10 },
-  tareaPregunta: { fontSize: 16, fontWeight: '600', color: '#4B3F2F' },
-  tareaPuntaje: { fontSize: 14, color: '#4B3F2F', marginTop: 4 },
-  progresoTexto: { marginTop: 4, fontSize: 14, fontWeight: '600', color: '#4B3F2F', textAlign: 'center' },
-  tareaCompletada: { opacity: 0.4 },
+  container: { 
+    flex: 1, 
+    padding: 16,
+     backgroundColor: '#FFF8F0' 
+    },
+  titulo: 
+  { fontSize: 24, 
+    fontWeight: 'bold',
+     marginBottom: 16, 
+     color: '#4B3F2F', 
+     textAlign: 'center' 
+    },
+  bloqueContainer: 
+  { marginBottom: 16,
+     backgroundColor: '#FFF',
+      borderRadius: 12, 
+      padding: 10,
+       shadowColor: '#000', 
+       shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+         shadowRadius: 4,
+          elevation: 3 
+        },
+  bloqueBoton: {
+     padding: 12,
+      borderRadius: 8,
+       alignItems: 'center' 
+      },
+  bloqueTitulo: { 
+    fontSize: 18, 
+    fontWeight: 'bold',
+     color: '#4B3F2F'
+     },
+  tareaContainer: {
+     backgroundColor: '#F7E9D7',
+      padding: 12, 
+      borderRadius: 8,
+       marginTop: 10 
+      },
+  tareaPregunta: {
+     fontSize: 16, 
+     fontWeight: '600',
+      color: '#4B3F2F' 
+    },
+  tareaPuntaje: { 
+    fontSize: 14,
+     color: '#4B3F2F',
+      marginTop: 4 
+    },
+  progresoTexto: {
+     marginTop: 4,
+      fontSize: 14, 
+      fontWeight: '600',
+       color: '#4B3F2F',
+        textAlign: 'center' 
+      },
+  tareaCompletada: { 
+    opacity: 0.4 },
 });
 
 export default TasksScreen;

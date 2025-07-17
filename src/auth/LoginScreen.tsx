@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { loginUser } from "../api/auth";
-import { useAuth } from "../hooks/useAuth"; // o desde context si no tienes el hook
+import { useAuth } from "../hooks/useAuth"; 
 import styles from "../themes/LoginStyles";
 
 const LoginScreen = () => {
