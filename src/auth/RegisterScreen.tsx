@@ -6,11 +6,7 @@ import { useTheme } from "../context/ThemeContext";
 import { registerUser } from "../api/auth";
 import styles from "../themes/RegisterStyles";
 
-// Tipos para TypeScript (opcional pero recomendado)
-type RootStackParamList = {
-  Login: undefined;
-  // Agrega otras rutas aquí según sea necesario
-};
+
 
 const RegisterScreen = () => {
   const { theme } = useTheme();
@@ -71,7 +67,7 @@ const RegisterScreen = () => {
             <MaterialCommunityIcons
               name="account-circle"
               size={24}
-              color="#BB86FC"
+              color="#FFA866"
               style={styles.icon}
             />
             <TextInput
@@ -87,7 +83,7 @@ const RegisterScreen = () => {
             <MaterialCommunityIcons
               name="email"
               size={24}
-              color="#BB86FC"
+              color="#FFA866"
               style={styles.icon}
             />
             <TextInput
@@ -105,7 +101,7 @@ const RegisterScreen = () => {
             <MaterialCommunityIcons
               name="lock"
               size={24}
-              color="#BB86FC"
+              color="#FFA866"
               style={styles.icon}
             />
             <TextInput
@@ -122,7 +118,7 @@ const RegisterScreen = () => {
             <MaterialCommunityIcons
               name="lock-check"
               size={24}
-              color="#BB86FC"
+              color="#FFA866"
               style={styles.icon}
             />
             <TextInput

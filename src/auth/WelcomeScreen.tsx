@@ -2,7 +2,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
+//import { Ionicons } from "@expo/vector-icons"; // para cualquier cosa dejo este de icons jaja
 import { useAuth } from "../hooks/useAuth"; // ajusta la ruta si es necesario
 
 import styles from "../themes/Styles";
@@ -23,7 +23,7 @@ const WelcomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <Image source={require('../../assets/images/logo2.png')} style={styles.image} />
+        <Image source={require('../../assets/images/Bienvenida.png')} style={styles.image} />
       </View>
 
       <Text style={styles.title}>¡Matemáticas Divertidas!</Text>

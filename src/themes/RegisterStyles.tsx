@@ -12,7 +12,7 @@ export default StyleSheet.create({
   },
 
   lightContainer: {
-    backgroundColor: '#3700B3', // Fondo azul (modo claro)
+    backgroundColor: '#A7DCFF', // Fondo azul (modo claro)
   },
   darkContainer: {
     backgroundColor: '#1E1E1E', // Fondo oscuro (modo oscuro)
@@ -42,7 +42,7 @@ export default StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#BB86FC',
+    color: '#72F1DC',
     marginLeft: 8,
   },
   form: {
@@ -65,7 +65,7 @@ export default StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#BB86FC',
+    borderColor: '#2685D5',
     fontSize: 16,
     color: '#000',
   },
@@ -76,7 +76,7 @@ export default StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginTop: 16,
-    backgroundColor: '#BB86FC',
+    backgroundColor: '#0aa2acff',
   },
   buttonText: {
     color: 'white',
@@ -121,7 +121,7 @@ export default StyleSheet.create({
   },
   switchLink: {
     fontSize: 16,
-    color: '#BB86FC',
+    color: '#1D1D2C',
     fontWeight: 'bold',
     marginLeft: 4,
   },

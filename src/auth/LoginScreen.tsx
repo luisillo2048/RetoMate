@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert,Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { loginUser } from "../api/auth";
@@ -28,7 +28,7 @@ const LoginScreen = () => {
         Alert.alert("Éxito", "Inicio de sesión exitoso");
         navigation.reset({
           index: 0,
-          routes: [{ name: "Home" }], // <- manda a TabNavigator
+          routes: [{ name: "Home" }], 
         });
       } else {
         const errorMsg = data?.msg || data?.message || "Credenciales incorrectas";
@@ -44,6 +44,12 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
+        <Image
+                  source={require("../../assets/images/logo2.png")}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+
         <Text style={styles.title}>Iniciar Sesión</Text>
         <TextInput
           placeholder="Correo"
