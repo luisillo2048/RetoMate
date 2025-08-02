@@ -4,12 +4,8 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#FFFFF0', // Fondo del menú en #FFFFF0
   },
 
-  lightContainer: {
-    backgroundColor: '#FFFFF0', // Fondo del menú en #FFFFF0 (modo claro)
-  },
   darkContainer: {
     backgroundColor: 'black', // Fondo del menú en negro (modo oscuro)
   },
