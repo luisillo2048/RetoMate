@@ -1,167 +1,69 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#3b82f6",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  iconContainer: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: "white",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "white",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 25,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  buttonText: {
-    color: "#3b82f6",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  imageContainer: {
-    flexDirection: "row",
-    marginTop: 20,
-    gap: 10,
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
+      container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#87CEEB'
+    },
+    card: {
+        width: '85%',
+        backgroundColor: '#ffffffff',
+        borderRadius: 20,
+        padding: 25,
+        zIndex: 1,
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+    },
+    logo: {
+        width: 150,
+        height: 150,
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+        color: '#333',
+    },
+    input: {
+        height: 50,
+        borderColor: '#FFD166',
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        marginBottom: 15,
+        backgroundColor: '#ffd1667e',
+    },
+    button: {
+        backgroundColor: '#FF9F1C',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 20,
+    },
+    footerText: {
+        color: '#666',
+    },
+    footerLink: {
+        color: '#4a90e2',
+        fontWeight: 'bold',
+    },
 
-  card: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
-    width: "90%",
-  },
-
-  input: {
-    width: "100%",
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#ddd",
-    fontSize: 16,
-    marginBottom: 10,
-  },
-
-  switchText: {
-    marginTop: 15,
-    textAlign: "center",
-    fontSize: 16,
-    color: "#666",
-  },
-  switchButton: {
-    color: "#3b82f6",
-    fontWeight: "bold",
-  },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1f2937",
-  },
-
-  headerSubtitle: {
-    fontSize: 14,
-    color: "#6b7280",
-  },
-  trophyContainer: {
-    backgroundColor: "#fef3c7",
-    padding: 12,
-    borderRadius: 50,
-  },
-  achievementsContainer: {
-    flexDirection: "column",
-    gap: 16,
-  },
-
-  achievementCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  achievementContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  achievementText: {
-    flex: 1,
-  },
-  achievementTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1f2937",
-  },
-  achievementDescription: {
-    fontSize: 14,
-    color: "#6b7280",
-  },
-  achievementIcon: {
-    marginLeft: 12,
-  },
-  progressContainer: {
-    flexDirection: "column",
-    gap: 8,
-  }, 
-
-  progressBar: {
-    height: 8,
-    backgroundColor: "#e5e7eb",
-    borderRadius: 4,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#10b981",
-    borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 12,
-    color: "#6b7280",
-    textAlign: "right",
-  },
-
-  
 });
