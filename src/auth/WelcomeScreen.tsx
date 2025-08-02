@@ -1,41 +1,176 @@
-// src/screens/WelcomeScreen.tsx
-import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, TouchableOpacity, Image, Animated } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-//import { Ionicons } from "@expo/vector-icons"; // para cualquier cosa dejo este de icons jaja
-import { useAuth } from "../hooks/useAuth"; // ajusta la ruta si es necesario
-
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useAuth } from "../hooks/useAuth"; 
 import styles from "../themes/Styles";
 
-const WelcomeScreen = () => {
-  const navigation = useNavigation();
+// Define tus rutas de navegación
+type RootStackParamList = {
+  Home: undefined;
+  Login: undefined;
+  Welcome: undefined;
+};
 
+type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
+
+// Importa las imágenes estáticamente
+const holaabuImage = require('../../assets/images/holaabu.png');
+const holaabuelitoImage = require('../../assets/images/holaabuelito.png');
+const bienvenidaImage = require('../../assets/images/Welcome1.png');
+
+const WelcomeScreen = () => {
+  const navigation = useNavigation<WelcomeScreenNavigationProp>();
   const { user } = useAuth();
+  
+  // Referencias para las animaciones
+  const anim1Ref = useRef<Animated.CompositeAnimation | null>(null);
+  const anim2Ref = useRef<Animated.CompositeAnimation | null>(null);
+  const anim3Ref = useRef<Animated.CompositeAnimation | null>(null);
+  const anim4Ref = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Opacidad animada para cada imagen
+  const topLeftOpacity = useRef(new Animated.Value(0)).current;
+  const topRightOpacity = useRef(new Animated.Value(0)).current;
+  const bottomLeftOpacity = useRef(new Animated.Value(0)).current;
+  const bottomRightOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Función para animar aparecer/desaparecer
+    const createAnimation = (animation: Animated.Value, delay: number): Animated.CompositeAnimation => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(animation, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.delay(500),
+          Animated.timing(animation, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+    };
+
+    // Crear animaciones
+    anim1Ref.current = createAnimation(topLeftOpacity, 0);
+    anim2Ref.current = createAnimation(topRightOpacity, 500);
+    anim3Ref.current = createAnimation(bottomLeftOpacity, 1000);
+    anim4Ref.current = createAnimation(bottomRightOpacity, 1500);
+
+    // Iniciar animaciones
+    anim1Ref.current.start();
+    anim2Ref.current.start();
+    anim3Ref.current.start();
+    anim4Ref.current.start();
+
+    // Limpieza
+    return () => {
+      anim1Ref.current?.stop();
+      anim2Ref.current?.stop();
+      anim3Ref.current?.stop();
+      anim4Ref.current?.stop();
+    };
+  }, []);
 
   const handleStart = () => {
     if (user) {
-      navigation.replace("Home"); 
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' }],
+      });
     } else {
-      navigation.navigate("Login"); 
+      navigation.navigate('Login');
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <Image source={require('../../assets/images/Bienvenida.png')} style={styles.image} />
-      </View>
+      {/* Imagen superior izquierda */}
+      <Animated.View style={[
+        styles.cornerImageContainer,
+        { 
+          top: 20,
+          left: 20,
+          opacity: topLeftOpacity
+        }
+      ]}>
+        <Image 
+          source={holaabuImage} 
+          style={styles.cornerImage}
+        />
+      </Animated.View>
 
-      <Text style={styles.title}>¡Matemáticas Divertidas!</Text>
-      <Text style={styles.subtitle}>Aprende matemáticas jugando y divirtiéndote</Text>
+      {/* Imagen superior derecha */}
+      <Animated.View style={[
+        styles.cornerImageContainer,
+        { 
+          top: 20,
+          right: 20,
+          opacity: topRightOpacity
+        }
+      ]}>
+        <Image 
+          source={holaabuelitoImage} 
+          style={styles.cornerImage}
+        />
+      </Animated.View>
 
-      <TouchableOpacity onPress={handleStart} style={styles.button}>
-        <Text style={styles.buttonText}>¡Comenzar!</Text>
-      </TouchableOpacity>
+      {/* Imagen inferior izquierda */}
+      <Animated.View style={[
+        styles.cornerImageContainer,
+        { 
+          bottom: 20,
+          left: 20,
+          opacity: bottomLeftOpacity
+        }
+      ]}>
+        <Image 
+          source={holaabuImage} 
+          style={styles.cornerImage}
+        />
+      </Animated.View>
 
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: "" }} style={styles.image} />
-        <Image source={{ uri: "" }} style={styles.image} />
+      {/* Imagen inferior derecha */}
+      <Animated.View style={[
+        styles.cornerImageContainer,
+        { 
+          bottom: 20,
+          right: 20,
+          opacity: bottomRightOpacity
+        }
+      ]}>
+        <Image 
+          source={holaabuelitoImage} 
+          style={styles.cornerImage}
+        />
+      </Animated.View>
+
+      {/* Contenido principal */}
+      <View style={styles.mainContent}>
+        <Image 
+          source={bienvenidaImage} 
+          style={styles.mainImage}
+        />
+        
+        <Text style={styles.title}>¡Matemáticas Divertidas!</Text>
+        <Text style={styles.subtitle}>
+          Aprende sumando sonrisas,{"\n"}
+          restando dificultades{"\n"}
+          y multiplicando diversión
+        </Text>
+
+        <TouchableOpacity 
+          onPress={handleStart} 
+          style={styles.button}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.buttonText}>¡Comenzar Aventura!</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
