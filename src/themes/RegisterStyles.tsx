@@ -1,49 +1,60 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 export default StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    minHeight: Platform.OS === 'web' ? '100vh' : '100%',
   },
   container: {
     flex: 1,
-    backgroundColor: '#3b82f6',
+    width: '100%',
   },
-
   lightContainer: {
-    backgroundColor: '#A7DCFF', // Fondo azul (modo claro)
+    backgroundColor: '#87CEEB', // Celeste claro
   },
   darkContainer: {
-    backgroundColor: '#1E1E1E', // Fondo oscuro (modo oscuro)
+    backgroundColor: '#1A237E', // Azul oscuro
   },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
+  bubblesContainer: {
+    pointerEvents: 'none',
+    zIndex: 0,
   },
-  whiteBox: {
-    width: '90%',
+  mainBox: {
+    width: Platform.OS === 'web' ? '40%' : '90%',
+    minWidth: Platform.OS === 'web' ? 400 : '90%',
+    maxWidth: 500,
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: 20,
-    marginTop: -50,
+    padding: 25,
+    marginVertical: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 10,
+    zIndex: 1,
+  },
+  headerImage: {
+    width: '100%',
+    height: 180,
+    marginBottom: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    justifyContent: 'center',
+    marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#72F1DC',
-    marginLeft: 8,
+    color: '#FF6B6B',
+    marginLeft: 10,
+    textShadowColor: 'rgba(0,0,0,0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   form: {
     width: '100%',
@@ -51,69 +62,55 @@ export default StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 15,
+    position: 'relative',
   },
   icon: {
     position: 'absolute',
-    left: 12,
+    left: 15,
     zIndex: 1,
   },
   input: {
     flex: 1,
-    paddingLeft: 48,
-    paddingRight: 16,
+    paddingLeft: 50,
+    paddingRight: 15,
     paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2685D5',
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#FFD166',
     fontSize: 16,
-    color: '#000',
+    color: '#333',
+    backgroundColor: '#FFF9F2',
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 16,
-    backgroundColor: '#0aa2acff',
+    padding: 15,
+    borderRadius: 15,
+    marginTop: 20,
+    backgroundColor: '#FF9F1C',
+    shadowColor: '#FF9F1C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   buttonIcon: {
-    marginLeft: 8,
-  },
-  codeContainer: {
-    alignItems: 'center',
-  },
-  codeTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 16,
-    color: '#BB86FC',
-  },
-  codeBox: {
-    padding: 24,
-    borderRadius: 12,
-    marginVertical: 16,
-    backgroundColor: '#EDE7F6',
-  },
-  codeText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#BB86FC',
-  },
-  codeSubtitle: {
-    fontSize: 16,
-    marginBottom: 16,
-    color: '#666',
+    marginLeft: 10,
   },
   switchContainer: {
     flexDirection: 'row',
-    marginTop: 24,
+    justifyContent: 'center',
+    marginTop: 20,
   },
   switchText: {
     fontSize: 16,
@@ -121,8 +118,9 @@ export default StyleSheet.create({
   },
   switchLink: {
     fontSize: 16,
-    color: '#1D1D2C',
+    color: '#06AED5',
     fontWeight: 'bold',
-    marginLeft: 4,
+    marginLeft: 5,
+    textDecorationLine: Platform.OS === 'web' ? 'underline' : 'none',
   },
 });
