@@ -116,7 +116,7 @@ const LoginScreen = () => {
             {/* FORMULARIO (zIndex: 1) */}
             <View style={styles.card}>
                 <Image
-                    source={require("../../assets/images/logo2.png")}
+                    source={require("../../assets/images/login1.png")}
                     style={styles.logo}
                     resizeMode="contain"
                 />
