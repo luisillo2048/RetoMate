@@ -208,9 +208,6 @@ const MenuScreen = () => {
               ]}
             >
               ¡Hola, Estudiante!
-              {block === "1" && " (Nivel Principiante)"}
-              {block === "2" && " (Nivel Intermedio)"}
-              {block === "3" && " (Nivel Avanzado)"}
             </Text>
             <Text
               style={[
@@ -218,7 +215,6 @@ const MenuScreen = () => {
                 theme === "light" ? styles.lightText : styles.darkText,
               ]}
             >
-              ¿Qué quieres aprender hoy?
             </Text>
           </View>
         </View>

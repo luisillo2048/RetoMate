@@ -15,7 +15,7 @@ export default StyleSheet.create({
     backgroundColor: '#87CEEB', // Celeste claro
   },
   darkContainer: {
-    backgroundColor: '#1A237E', // Azul oscuro
+    backgroundColor: '#87CEEB', // Azul oscuro
   },
   bubblesContainer: {
     pointerEvents: 'none',

@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView,RefreshControl,ActivityIndicator,Image} from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator, Image, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import Collapsible from 'react-native-collapsible';
 import * as Animatable from 'react-native-animatable';
 import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import * as Speech from 'expo-speech';
 import styles from '../themes/TasksStyles';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -16,6 +17,7 @@ interface Tarea {
   _id: string;
   pregunta: string;
   puntaje: number;
+  dificultad?: string;
   opciones?: string[];
   respuestaCorrecta?: string;
   imagen?: string;
@@ -36,13 +38,38 @@ const TasksScreen = () => {
   const [tareasCompletadas, setTareasCompletadas] = useState(false);
   const [mostrarRespuesta, setMostrarRespuesta] = useState(false);
   const [bloquearOpciones, setBloquearOpciones] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   const bloques = [1, 2, 3, 4, 5, 6];
 
-  // Función para cargar datos
+  const leerTexto = (texto: string) => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    }
+    Speech.speak(texto, {
+      language: 'es-ES',
+      onStart: () => setIsSpeaking(true),
+      onDone: () => setIsSpeaking(false),
+      onStopped: () => setIsSpeaking(false),
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (tareaActual) {
+      leerTexto(tareaActual.pregunta);
+    }
+  }, [tareaActual]);
+
   const loadData = useCallback(async () => {
     try {
-      // Cargar tareas por bloque
       await Promise.all(
         bloques.map(async (bloque) => {
           const response = await axios.get(`${apiUrl}/tarea/tareas/bloque/${bloque}`);
@@ -50,7 +77,6 @@ const TasksScreen = () => {
         })
       );
 
-      // Cargar progreso del usuario
       if (user) {
         const token = await AsyncStorage.getItem('token');
         if (token) {
@@ -67,18 +93,15 @@ const TasksScreen = () => {
     }
   }, [user]);
 
-  // Efecto inicial para cargar datos
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  // Función para manejar el refresh
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     loadData();
   }, [loadData]);
 
-  // Calcular bloques desbloqueados
   useEffect(() => {
     const nuevosDesbloqueados = [1];
 
@@ -125,6 +148,23 @@ const TasksScreen = () => {
     return totalTareas > 0 ? totalCompletadas / totalTareas : 0;
   };
 
+  const getDifficultyColor = (dificultad?: string) => {
+    switch (dificultad?.toLowerCase()) {
+      case 'fácil':
+      case 'facil':
+        return '#4CAF50';
+      case 'media':
+      case 'intermedio':
+        return '#FFC107';
+      case 'difícil':
+      case 'dificil':
+      case 'avanzado':
+        return '#F44336';
+      default:
+        return '#9E9E9E';
+    }
+  };
+
   const verificarRespuesta = (opcion: string) => {
     if (!tareaActual || bloquearOpciones) return;
     
@@ -144,7 +184,7 @@ const TasksScreen = () => {
         setLoading(false);
 
         if (esCorrecta) {
-          // No guardamos el progreso hasta que presione Continuar
+          setShowCompletionModal(true);
         }
       } catch (error) {
         console.error('Error al verificar respuesta:', error);
@@ -176,13 +216,14 @@ const TasksScreen = () => {
           setTareasCompletadas(true);
         } else {
           resetGameState();
-          await loadData(); // Recargar datos para actualizar progresos
+          await loadData();
         }
       }
     } catch (error) {
       console.error('Error al guardar progreso:', error);
     } finally {
       setLoading(false);
+      setShowCompletionModal(false);
     }
   };
 
@@ -255,8 +296,20 @@ const TasksScreen = () => {
                 activeOpacity={completada ? 1 : 0.7}
                 disabled={!!completada}
               >
-                <Text style={styles.tareaPregunta}>{tarea.pregunta}</Text>
-                <Text style={styles.tareaPuntaje}>Puntaje: {tarea.puntaje}</Text>
+                <View style={styles.tareaHeader}>
+                  <Text style={styles.tareaPregunta}>{tarea.pregunta}</Text>
+                  {completada && <FontAwesome name="check-circle" size={20} color="#4CAF50" />}
+                </View>
+                <View style={styles.tareaFooter}>
+                  <Text style={styles.tareaPuntaje}>Puntaje: {tarea.puntaje}</Text>
+                  {tarea.dificultad && (
+                    <Text style={[styles.tareaDificultad, { 
+                      backgroundColor: getDifficultyColor(tarea.dificultad) 
+                    }]}>
+                      {tarea.dificultad}
+                    </Text>
+                  )}
+                </View>
               </TouchableOpacity>
             );
           })}
@@ -288,77 +341,143 @@ const TasksScreen = () => {
     const imageUrl = getImageUrl(tareaActual.imagen || '');
 
     return (
-      <ScrollView 
-        style={styles.container}
-        contentContainerStyle={{ flexGrow: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#DBA975']}
-            tintColor="#DBA975"
-          />
-        }
-      >
-        {imageUrl && (
-          <Image 
-            source={{ uri: imageUrl }} 
-            style={styles.imagen}
-            resizeMode="contain"
-            onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error)}
-          />
-        )}
-        
-        <Text style={styles.title}>{tareaActual.pregunta}</Text>
-
-        {tareaActual.opciones?.map((opcion, index) => {
-          const isSelected = selected === opcion;
-          const isCorrect = opcion === tareaActual.respuestaCorrecta;
-
-          let backgroundColor = '#F0F0F0';
-          if (respondido && mostrarRespuesta) {
-            if (isSelected && isCorrect) backgroundColor = '#A2F2B2';
-            else if (isSelected && !isCorrect) backgroundColor = '#F2A2A2';
-            else if (isCorrect) backgroundColor = '#CFFFCF';
-          } else if (isSelected) {
-            backgroundColor = '#E0E0E0';
-          }
-
-          return (
-            <TouchableOpacity
-              key={index}
-              style={[styles.optionButton, { backgroundColor }]}
-              disabled={respondido || loading || bloquearOpciones}
-              onPress={() => verificarRespuesta(opcion)}
-            >
-              <Text style={styles.optionText}>{opcion}</Text>
-            </TouchableOpacity>
-          );
-        })}
-
-        {loading && <ActivityIndicator size="large" color="#BB86F2" style={{ marginTop: 20 }} />}
-
-        {respondido && mostrarRespuesta && (
-          <View style={styles.feedbackContainer}>
-            <Ionicons
-              name={correcta ? 'checkmark-circle' : 'close-circle'}
-              size={64}
-              color={correcta ? '#4CAF50' : '#F44336'}
+      <View style={styles.container}>
+        <ScrollView 
+          contentContainerStyle={{ flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#DBA975']}
+              tintColor="#DBA975"
             />
-            <Text style={styles.feedbackText}>
-              {correcta ? '¡Correcto! 🎉' : 'Incorrecto 😕'}
-            </Text>
-            
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={handleContinuar}
-              disabled={loading}
-            >
-              <Text style={styles.nextButtonText}>Continuar</Text>
+          }
+        >
+          {imageUrl && (
+            <Image 
+              source={{ uri: imageUrl }} 
+              style={styles.imagen}
+              resizeMode="contain"
+              onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error)}
+            />
+          )}
+          
+          <View style={styles.questionHeader}>
+            <Text style={styles.title}>{tareaActual.pregunta}</Text>
+            <TouchableOpacity onPress={() => leerTexto(tareaActual.pregunta)}>
+              <Ionicons 
+                name={isSpeaking ? 'volume-high' : 'volume-medium'} 
+                size={24} 
+                color="#4B3F2F" 
+              />
             </TouchableOpacity>
           </View>
-        )}
-      </ScrollView>
+
+          {tareaActual.dificultad && (
+            <View style={styles.difficultyContainer}>
+              <Text style={[styles.difficultyText, { 
+                backgroundColor: getDifficultyColor(tareaActual.dificultad) 
+              }]}>
+                Dificultad: {tareaActual.dificultad}
+              </Text>
+            </View>
+          )}
+
+          {tareaActual.opciones?.map((opcion, index) => {
+            const isSelected = selected === opcion;
+            const isCorrect = opcion === tareaActual.respuestaCorrecta;
+
+            let backgroundColor = '#F0F0F0';
+            if (respondido && mostrarRespuesta) {
+              if (isSelected && isCorrect) backgroundColor = '#A2F2B2';
+              else if (isSelected && !isCorrect) backgroundColor = '#F2A2A2';
+              else if (isCorrect) backgroundColor = '#CFFFCF';
+            } else if (isSelected) {
+              backgroundColor = '#E0E0E0';
+            }
+
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[styles.optionButton, { backgroundColor }]}
+                disabled={respondido || loading || bloquearOpciones}
+                onPress={() => verificarRespuesta(opcion)}
+                onLongPress={() => leerTexto(opcion)}
+              >
+                <Text style={styles.optionText}>{opcion}</Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {loading && <ActivityIndicator size="large" color="#BB86F2" style={{ marginTop: 20 }} />}
+
+          {respondido && mostrarRespuesta && (
+            <View style={styles.feedbackContainer}>
+              <Ionicons
+                name={correcta ? 'checkmark-circle' : 'close-circle'}
+                size={64}
+                color={correcta ? '#4CAF50' : '#F44336'}
+              />
+              <Text style={styles.feedbackText}>
+                {correcta ? '¡Respuesta Correcta! 🎉' : 'Respuesta Incorrecta 😕'}
+              </Text>
+              <Text style={styles.correctAnswerText}>
+                La respuesta correcta es: {tareaActual.respuestaCorrecta}
+              </Text>
+              
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={handleContinuar}
+                disabled={loading}
+              >
+                <Text style={styles.nextButtonText}>Continuar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Modal de Tarea Completada */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showCompletionModal && correcta}
+          onRequestClose={() => setShowCompletionModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Ionicons name="checkmark-done-circle" size={50} color="#4CAF50" />
+                <Text style={styles.modalTitle}>¡Tarea Completada!</Text>
+              </View>
+              
+              <View style={styles.modalBody}>
+                <Text style={styles.modalText}>Has completado esta tarea correctamente</Text>
+                
+                <View style={styles.modalInfoContainer}>
+                  <Text style={styles.modalInfoLabel}>Dificultad:</Text>
+                  <Text style={[styles.modalInfoValue, { 
+                    color: getDifficultyColor(tareaActual?.dificultad) 
+                  }]}>
+                    {tareaActual?.dificultad || 'N/A'}
+                  </Text>
+                </View>
+                
+                <View style={styles.modalInfoContainer}>
+                  <Text style={styles.modalInfoLabel}>Puntos ganados:</Text>
+                  <Text style={styles.modalInfoValue}>{tareaActual?.puntaje || 0}</Text>
+                </View>
+              </View>
+              
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleContinuar}
+              >
+                <Text style={styles.modalButtonText}>Aceptar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
     );
   }
 
