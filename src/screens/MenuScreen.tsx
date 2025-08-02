@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Modal } from "react-native";
 import { FontAwesome5, Ionicons, MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from 'expo-linear-gradient';
 import { useUserLevel } from "../context/UserLevelContext";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
@@ -15,7 +16,7 @@ const MenuScreen = () => {
 
   const [isDrawerVisible, setDrawerVisible] = useState(false);
 
-  // Actividades con nombres de pantalla correctos (sin "/src/screens/")
+  //Aqu mis Actividades con nombres de pantalla correctos (sin "/src/screens/")
   const beginnerActivities = [
     {
       icon: FontAwesome5,
@@ -92,6 +93,10 @@ const MenuScreen = () => {
     block === "1" ? beginnerActivities : block === "2" ? intermediateActivities : advancedActivities;
 
   return (
+     <LinearGradient
+          colors={['#6DD5FA', '#FF6B6B']}
+          style={styles.container}
+        >
     <View style={{ flex: 1 }}>
       {/* Drawer Modal (se mantiene IGUAL) */}
       <Modal visible={isDrawerVisible} animationType="slide" transparent>
@@ -258,6 +263,7 @@ const MenuScreen = () => {
         </View>
       </ScrollView>
     </View>
+    </LinearGradient>
   );
 };
 
