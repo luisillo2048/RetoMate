@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend-reto-mate",
-    "slug": "frontend-reto-mate",
+    "name": "RetoMate",
+    "slug": "retomate",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo2.png",
@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.frontendretomate"
     },
     "web": {
       "favicon": "./assets/favicon.png"
