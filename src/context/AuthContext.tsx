@@ -35,7 +35,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       const response = await axios.get(`${apiUrl}/auth/me`);
-      setUser(response.data);
+
+      // 👇 Mapeo de _id a id
+      const userData = response.data;
+      setUser({
+        id: userData._id, // siempre tendrás user.id
+        username: userData.username,
+        email: userData.email,
+      });
     } catch (error: any) {
       setUser(null);
       if (error.response?.status === 401) {
@@ -69,7 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Este hook es lo que estabas olvidando
+// Hook para usar el contexto de autenticación
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
