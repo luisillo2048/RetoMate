@@ -72,6 +72,9 @@ const LoginScreen = () => {
         }
     };
 
+    const usernameRef = useRef<TextInput>(null);
+    const passwdRef = useRef<TextInput>(null);
+
     return (
         <View style={styles.container}>
             {/* CAPA DE BURBUJAS (absolute, zIndex: 2) */}
@@ -124,20 +127,26 @@ const LoginScreen = () => {
                 <Text style={styles.title}>Iniciar Sesión</Text>
                 
                 <TextInput
+                    ref={usernameRef}
                     placeholder="Correo electrónico"
                     value={email}
                     onChangeText={setEmail}
                     style={styles.input}
                     autoCapitalize="none"
                     keyboardType="email-address"
+                    onSubmitEditing={() => passwdRef.current?.focus()}
+                    returnKeyType="next"
                 />
                 
                 <TextInput
+                    ref={passwdRef}
                     placeholder="Contraseña"
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
                     style={styles.input}
+                    onSubmitEditing={handleLogin}
+                    returnKeyType="done"
                 />
                 
                 <TouchableOpacity 

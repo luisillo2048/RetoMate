@@ -102,6 +102,11 @@ const RegisterScreen = () => {
     }
   };
 
+    const usernameRef = useRef<TextInput>(null);
+    const emailRef = useRef<TextInput>(null);
+    const passwdRef = useRef<TextInput>(null);
+    const passwd2Ref = useRef<TextInput>(null);
+
   return (
     <ScrollView
       contentContainerStyle={styles.scrollContainer}
@@ -175,11 +180,14 @@ const RegisterScreen = () => {
               style={styles.icon}
             />
             <TextInput
+              ref={usernameRef}
               placeholder="Tu nombre divertido"
               placeholderTextColor="#888"
               value={username}
               onChangeText={setUsername}
               style={styles.input}
+              onSubmitEditing={() => emailRef.current?.focus()}
+              returnKeyType="next"
             />
           </View>
 
@@ -191,6 +199,7 @@ const RegisterScreen = () => {
               style={styles.icon}
             />
             <TextInput
+              ref={emailRef}
               placeholder="Correo (si tienes uno)"
               placeholderTextColor="#888"
               value={email}
@@ -198,6 +207,8 @@ const RegisterScreen = () => {
               autoCapitalize="none"
               keyboardType="email-address"
               style={styles.input}
+              onSubmitEditing={() => passwdRef.current?.focus()}
+              returnKeyType="next"
             />
           </View>
 
@@ -209,12 +220,15 @@ const RegisterScreen = () => {
               style={styles.icon}
             />
             <TextInput
+              ref={passwdRef}
               placeholder="Contraseña secreta"
               placeholderTextColor="#888"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               style={styles.input}
+              onSubmitEditing={() => passwd2Ref.current?.focus()}
+              returnKeyType="next"
             />
           </View>
 
@@ -226,12 +240,15 @@ const RegisterScreen = () => {
               style={styles.icon}
             />
             <TextInput
+              ref={passwd2Ref}
               placeholder="Repite tu contraseña"
               placeholderTextColor="#888"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
               style={styles.input}
+              onSubmitEditing={handleRegister}
+              returnKeyType="next"
             />
           </View>
 
