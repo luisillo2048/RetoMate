@@ -123,4 +123,24 @@ export default StyleSheet.create({
     marginLeft: 5,
     textDecorationLine: Platform.OS === 'web' ? 'underline' : 'none',
   },
+
+   pickerContainer: {
+    flex: 1,
+    paddingLeft: 50,
+    paddingRight: 15,
+    paddingVertical: 12,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#FFD166',
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#FFF9F2',
+    marginBottom: 16,
+  },
+  picker: {
+    flex: 1,
+    color: "#000",
+    fontSize: 16,
+    height: 50,
+  },
 });

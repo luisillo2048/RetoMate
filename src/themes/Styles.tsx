@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87CEEB', // Un color cálido para niños
+    backgroundColor: '#87CEEB', 
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',

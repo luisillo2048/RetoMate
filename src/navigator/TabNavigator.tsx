@@ -19,7 +19,6 @@ const TabNavigator = () => {
         tabBarInactiveTintColor: "gray",
         tabBarIcon: ({ color, size }) => {
           let iconName: any;
-
           switch (route.name) {
             case "Menu":
               iconName = "home-outline";
@@ -37,7 +36,6 @@ const TabNavigator = () => {
               iconName = "trophy-outline";
               break;
           }
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}

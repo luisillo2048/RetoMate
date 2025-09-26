@@ -10,12 +10,16 @@ export const loginUser = async (email: string, password: string) => {
 export const registerUser = async (
   username: string,
   email: string,
-  password: string
+  password: string,
+  grado: string,
+  codigo_maestro: string
 ) => {
   const response = await axios.post(`${apiUrl}/auth/register`, {
     username,
     email,
     password,
+    grado,
+    codigo_maestro,
   });
   return response.data;
 };

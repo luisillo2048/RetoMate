@@ -12,7 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../context/AuthContext";
 
-const API_BASE_URL = "http://192.168.137.155:8000";
+const API_BASE_URL = "http://192.168.1.13:8000";
 
 type Message = {
   id: string;

@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import WelcomeScreen from "../auth/WelcomeScreen";
 import LoginScreen from "../auth/LoginScreen";
 import RegisterScreen from "../auth/RegisterScreen";
-import TabNavigator from "./TabNavigator"; // Tus tabs van aquí
+import TabNavigator from "./TabNavigator";
 
 const Stack = createNativeStackNavigator();
 

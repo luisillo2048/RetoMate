@@ -1,26 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Alert,
-  Animated,
-  Dimensions,
-  StyleSheet
-} from "react-native";
+import {View,Text,TextInput,TouchableOpacity,ScrollView,Image,Alert,Animated,Dimensions,StyleSheet,} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from '@react-navigation/stack';
+import { StackNavigationProp } from "@react-navigation/stack";
 import { useTheme } from "../context/ThemeContext";
 import { registerUser } from "../api/auth";
 import styles from "../themes/RegisterStyles";
+import { Picker } from "@react-native-picker/picker";
 
-// Importar imágenes directamente
-const burbujaImage = require('../../assets/images/animacionRegister.png');
-const registerImage = require('../../assets/images/register1.png');
+// Imágenes
+const burbujaImage = require("../../assets/images/animacionRegister.png");
+const registerImage = require("../../assets/images/register1.png");
 
 // Tipos de navegación
 type RootStackParamList = {
@@ -28,7 +18,10 @@ type RootStackParamList = {
   Register: undefined;
 };
 
-type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
+type RegisterScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Register"
+>;
 
 const RegisterScreen = () => {
   const { theme } = useTheme();
@@ -37,10 +30,12 @@ const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [grado, setGrado] = useState("");
+  const [codigo_maestro, setCodigoMaestro] = useState("");
 
   const { width, height } = Dimensions.get("window");
   const NUMERO_BURBUJAS = 30;
-  
+
   const burbujasRef = useRef(
     Array.from({ length: NUMERO_BURBUJAS }, () => ({
       animation: new Animated.Value(0),
@@ -50,7 +45,7 @@ const RegisterScreen = () => {
       delay: Math.random() * 8000,
       startY: height + 100,
       endY: -200,
-      size: 30 + Math.random() * 110
+      size: 30 + Math.random() * 110,
     }))
   ).current;
 
@@ -63,26 +58,26 @@ const RegisterScreen = () => {
           toValue: 1,
           duration: 8000 + Math.random() * 7000,
           delay: burbuja.delay,
-          useNativeDriver: true
+          useNativeDriver: true,
         });
-        
+
         const animationInstance = anim.start(() => {
           burbuja.animation.setValue(0);
           animateBurbuja();
         });
-        
+
         animationRefs.push(animationInstance);
       };
       animateBurbuja();
     });
 
     return () => {
-      animationRefs.forEach(anim => anim?.stop());
+      animationRefs.forEach((anim) => anim?.stop());
     };
   }, []);
 
   const handleRegister = async () => {
-    if (!username || !password || !confirmPassword) {
+    if (!username || !password || !confirmPassword || !grado) {
       Alert.alert("Oops!", "¡Falta llenar algunos campos!");
       return;
     }
@@ -93,11 +88,13 @@ const RegisterScreen = () => {
     }
 
     try {
-      await registerUser(username, email, password);
+      await registerUser(username, email, password, grado, codigo_maestro);
       Alert.alert("¡Bien hecho!", "¡Registro completado! Ahora puedes jugar");
       navigation.navigate("Login");
     } catch (error: any) {
-      const msg = error.response?.data?.message || "Algo salió mal. ¡Inténtalo de nuevo!";
+      const msg =
+        error.response?.data?.message ||
+        "Algo salió mal. ¡Inténtalo de nuevo!";
       Alert.alert("Oops!", msg);
     }
   };
@@ -115,7 +112,7 @@ const RegisterScreen = () => {
         theme === "light" ? styles.lightContainer : styles.darkContainer,
       ]}
     >
-      {/* Fondo con burbujas animadas */}
+      {/* Fondo animado */}
       <View style={[StyleSheet.absoluteFill, styles.bubblesContainer]}>
         {burbujasRef.map((burbuja, index) => {
           const translateY = burbuja.animation.interpolate({
@@ -138,7 +135,7 @@ const RegisterScreen = () => {
               key={`bubble-${index}`}
               source={burbujaImage}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 opacity,
                 width: burbuja.size,
                 height: burbuja.size,
@@ -146,15 +143,15 @@ const RegisterScreen = () => {
                 transform: [
                   { translateX },
                   { translateY },
-                  { scale: burbuja.scale }
-                ]
+                  { scale: burbuja.scale },
+                ],
               }}
             />
           );
         })}
       </View>
 
-      {/* Contenedor principal del formulario */}
+      {/* Caja principal */}
       <View style={styles.mainBox}>
         <Image
           source={registerImage}
@@ -163,15 +160,12 @@ const RegisterScreen = () => {
         />
 
         <View style={styles.header}>
-          <MaterialCommunityIcons
-            name="star"
-            size={32}
-            color="#FFD700"
-          />
+          <MaterialCommunityIcons name="star" size={32} color="#FFD700" />
           <Text style={styles.title}>¡Vamos a Aprender!</Text>
         </View>
 
         <View style={styles.form}>
+          {/* Nombre */}
           <View style={styles.inputContainer}>
             <MaterialCommunityIcons
               name="account"
@@ -191,6 +185,7 @@ const RegisterScreen = () => {
             />
           </View>
 
+          {/* Correo */}
           <View style={styles.inputContainer}>
             <MaterialCommunityIcons
               name="email"
@@ -212,6 +207,7 @@ const RegisterScreen = () => {
             />
           </View>
 
+          {/* Contraseña */}
           <View style={styles.inputContainer}>
             <MaterialCommunityIcons
               name="lock"
@@ -232,6 +228,7 @@ const RegisterScreen = () => {
             />
           </View>
 
+          {/* Confirmar contraseña */}
           <View style={styles.inputContainer}>
             <MaterialCommunityIcons
               name="lock-check"
@@ -252,8 +249,49 @@ const RegisterScreen = () => {
             />
           </View>
 
-          <TouchableOpacity 
-            onPress={handleRegister} 
+          {/* Selector de grado */}
+  <View style={styles.pickerContainer}>
+  <MaterialCommunityIcons
+    name="school"
+    size={24}
+    color="#4ECDC4"
+    style={styles.icon}
+  />
+  <Picker
+    selectedValue={grado}
+    style={styles.picker}
+    dropdownIconColor="#4ECDC4"
+    onValueChange={(itemValue) => setGrado(itemValue)}
+  >
+    <Picker.Item label="Selecciona tu grado" value="" />
+    <Picker.Item label="1A°" value="1A°" />
+    <Picker.Item label="1B°" value="1B°" />
+    <Picker.Item label="1C°" value="1C°" />
+  </Picker>
+</View>
+
+
+          {/* Código maestro */}
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="key"
+              size={24}
+              color="#4ECDC4"
+              style={styles.icon}
+            />
+            <TextInput
+              placeholder="Código del maestro"
+              placeholderTextColor="#888"
+              value={codigo_maestro}
+              onChangeText={setCodigoMaestro}
+              autoCapitalize="none"
+              style={styles.input}
+            />
+          </View>
+
+          {/* Botón de registro */}
+          <TouchableOpacity
+            onPress={handleRegister}
             style={styles.button}
             activeOpacity={0.7}
           >
@@ -267,6 +305,7 @@ const RegisterScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Link para login */}
         <View style={styles.switchContainer}>
           <Text style={styles.switchText}>¿Ya tienes cuenta?</Text>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
