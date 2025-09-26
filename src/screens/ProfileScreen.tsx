@@ -1,9 +1,17 @@
 import React, { useContext, useEffect, useState, useCallback } from "react";
-import { View, Text, ActivityIndicator, FlatList, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Image,
+} from "react-native";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Progress from 'react-native-progress';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Progress from "react-native-progress";
+import { MaterialCommunityIcons } from "@expo/vector-icons"; 
 import styles from "../themes/ProfileStyles";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -19,7 +27,7 @@ const ProfileScreen = () => {
 
   const loadData = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem("token");
       if (!auth?.user || !token) {
         setProgressLoading(false);
         return;
@@ -36,9 +44,11 @@ const ProfileScreen = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setTotalPuntaje(resumenResponse.data.totalPuntaje);
-
     } catch (err: any) {
-      console.error("Error al cargar el progreso:", err?.response?.data || err.message);
+      console.error(
+        "Error al cargar el progreso:",
+        err?.response?.data || err.message
+      );
     } finally {
       setProgressLoading(false);
       setRefreshing(false);
@@ -70,8 +80,8 @@ const ProfileScreen = () => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="dodgerblue" />
-        <Text style={styles.text}>Cargando datos...</Text>
+        <ActivityIndicator size="large" color="#FF6F61" />
+        <Text style={styles.text}>🎉 Cargando magia...</Text>
       </View>
     );
   }
@@ -92,44 +102,58 @@ const ProfileScreen = () => {
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => (
         <View style={styles.progressItem}>
-          <Text style={styles.text}>Tarea: {item.id_tarea?.pregunta || "Sin título"}</Text>
-          <Text style={styles.text}>Puntaje: {item.puntaje}</Text>
+          <MaterialCommunityIcons name="star" size={24} color="#FFD700" />
           <Text style={styles.text}>
-            Fecha: {new Date(item.fecha_progreso).toLocaleString()}
+            ✨ Tarea: {item.id_tarea?.pregunta || "Sin título"}
+          </Text>
+          <Text style={styles.text}>🏆 Puntaje: {item.puntaje}</Text>
+          <Text style={styles.text}>
+            📅 Fecha: {new Date(item.fecha_progreso).toLocaleString()}
           </Text>
         </View>
       )}
       ListHeaderComponent={
         <View style={styles.container}>
-          {/* Sección de Perfil */}
+          {/* Perfil */}
           <View style={styles.profileSection}>
-            <Text style={styles.title}>Perfil</Text>
+            <Image
+              source={require("../../assets/images/logo2.png")}
+              style={styles.avatar}
+            />
+            <Text style={styles.title}>👦 Mi Perfil</Text>
             {auth?.user ? (
               <>
-                <Text style={styles.text}>Nombre: {auth.user.username}</Text>
-                <Text style={styles.text}>Correo: {auth.user.email}</Text>
+                <Text style={styles.text}>📝 Nombre: {auth.user.username}</Text>
+                <Text style={styles.text}>📧 Correo: {auth.user.email}</Text>
+                <Text style={styles.text}>
+                  🎓 Grado: {auth.user.grado || "No asignado"}
+                </Text>
               </>
             ) : (
-              <Text style={styles.text}>No hay usuario autenticado.</Text>
+              <Text style={styles.text}>🚀 No hay usuario autenticado.</Text>
             )}
           </View>
 
-          {/* Sección de Progreso */}
+          {/* Progreso */}
           <View style={{ marginTop: 30, width: "100%" }}>
-            <Text style={styles.title}>Mi Progreso</Text>
+            <Text style={styles.title}>🌈 Mi Progreso</Text>
             {progressLoading ? (
-              <ActivityIndicator size="large" color="dodgerblue" />
+              <ActivityIndicator size="large" color="#FF6F61" />
             ) : progress.length === 0 ? (
-              <Text style={styles.text}>No tienes progreso registrado.</Text>
+              <Text style={styles.text}>📭 No tienes progreso registrado.</Text>
             ) : (
               <>
-                <Text style={styles.text}>Puntaje Total: {totalPuntaje} / 100</Text>
+                <Text style={styles.text}>
+                  🎯 Puntaje Total: {totalPuntaje} / 100
+                </Text>
                 <Progress.Bar
                   progress={progressPercentage}
                   width={null}
-                  height={20}
-                  color="dodgerblue"
+                  height={25}
+                  color="#FF6F61"
+                  unfilledColor="#FFE4E1"
                   borderWidth={0}
+                  borderRadius={15}
                   style={styles.progressBar}
                 />
               </>
@@ -141,8 +165,8 @@ const ProfileScreen = () => {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={["dodgerblue"]}
-          tintColor="dodgerblue"
+          colors={["#FF6F61"]}
+          tintColor="#FF6F61"
         />
       }
       contentContainerStyle={styles.flatListContainer}
