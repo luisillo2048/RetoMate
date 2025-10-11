@@ -1,60 +1,137 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8DC",
-    alignItems: "center",
     padding: 20,
+    backgroundColor: '#f8f9fa',
   },
-  text: {
-    fontSize: 18,
-    color: "#333",
-    marginVertical: 5,
-  },
-  errorText: {
-    fontSize: 18,
-    color: "red",
-    textAlign: "center",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#FF6F61",
-    marginBottom: 10,
-    textAlign: "center",
+  flatListContainer: {
+    paddingBottom: 30,
   },
   profileSection: {
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 20,
-    backgroundColor: "#FFF0F5",
-    padding: 15,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 15,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    width: "100%",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 15,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  text: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#FF6F61',
+    textAlign: 'center',
+    marginTop: 20,
   },
   progressItem: {
-    backgroundColor: "#E6E6FA",
+    backgroundColor: '#FFF',
     padding: 15,
-    marginVertical: 8,
-    borderRadius: 15,
-    width: "100%",
+    marginVertical: 5,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   progressBar: {
     marginTop: 10,
+    marginBottom: 15,
   },
-  flatListContainer: {
-    paddingBottom: 50,
+  // Nuevos estilos para puntos
+  pointsCard: {
+    backgroundColor: '#FFD700',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+  pointsContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pointsInfo: {
+    marginLeft: 15,
+    flex: 1,
+  },
+  availablePoints: {
+    color: '#FFF',
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+  pointsDetail: {
+    color: '#FFF',
+    fontSize: 16,
+    opacity: 0.9,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#FFF',
+    padding: 15,
+    borderRadius: 10,
+    marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  spentValue: {
+    color: '#FF6F61',
+  },
+  progressContainer: {
+    backgroundColor: '#f5f5f5',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#666',
     marginBottom: 10,
+    textAlign: 'center',
   },
 });
-
-export default styles;

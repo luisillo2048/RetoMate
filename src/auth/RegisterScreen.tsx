@@ -8,11 +8,9 @@ import { registerUser } from "../api/auth";
 import styles from "../themes/RegisterStyles";
 import { Picker } from "@react-native-picker/picker";
 
-// Imágenes
 const burbujaImage = require("../../assets/images/animacionRegister.png");
 const registerImage = require("../../assets/images/register1.png");
 
-// Tipos de navegación
 type RootStackParamList = {
   Login: undefined;
   Register: undefined;

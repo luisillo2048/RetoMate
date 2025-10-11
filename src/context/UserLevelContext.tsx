@@ -1,3 +1,4 @@
+// context/UserLevelContext.tsx
 import React, { createContext, useContext, useState } from 'react';
 
 // Definición del tipo 'Block'
@@ -11,29 +12,29 @@ interface UserLevelContextType {
   setBlock: (block: Block) => void; 
 }
 
-// Aqui es Creación del contexto con valor por defecto
+// Creación del contexto con valor por defecto
 const UserLevelContext = createContext<UserLevelContextType | undefined>(undefined);
 
 // Proveedor del contexto
 export const UserLevelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Aqui el Estado por defecto es '1'
+  // Estado por defecto es '1'
   const [block, setBlock] = useState<Block>('1'); 
 
   return (
     <UserLevelContext.Provider value={{ block, setBlock }}>
-      {children} {}
+      {children}
     </UserLevelContext.Provider>
   );
 };
 
-//Aqui el Hook para acceder al contexto
+// Hook para acceder al contexto
 export const useUserLevel = (): UserLevelContextType => {
-  // Aqui nos Accede al contexto
+  // Accede al contexto
   const context = useContext(UserLevelContext); 
   if (!context) {
-    // Aqui nos mandara Error si no está envuelto en el proveedor
+    // Error si no está envuelto en el proveedor
     throw new Error('useUserLevel must be used within a UserLevelProvider'); 
   }
-  // Nos Devuelve el contexto
+  // Devuelve el contexto
   return context; 
 };

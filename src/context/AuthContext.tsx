@@ -1,13 +1,25 @@
+// AuthContext.js CORREGIDO Y FINAL
+
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import Constants from "expo-constants"; // <--- 1. IMPORTA CONSTANTS
 
-const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+// 2. LEE LA URL DE LA FORMA CORRECTA. ESTA ES LA LÍNEA CLAVE.
+const API_URL = Constants.expoConfig?.extra?.API_URL;
+
+// 3. (OPCIONAL PERO RECOMENDADO) UNA VERIFICACIÓN PARA ESTAR SEGUROS
+console.log('LA URL QUE ESTÁ USANDO LA APP ES:', API_URL); 
+if (!API_URL) {
+  alert("ALERTA: La URL de la API no se ha cargado. Revisa la configuración.");
+}
 
 interface User {
   id: string;
   username: string;
   email: string;
+  grado?: string;
+  codigo_maestro?: string;
 }
 
 interface AuthContextType {
@@ -33,16 +45,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      const response = await axios.get(`${apiUrl}/auth/me`);
+      
+      // Ahora esta llamada usará la URL correcta leída desde Constants
+      const response = await axios.get(`${API_URL}/auth/me`);
 
-      // 👇 Mapeo de _id a id
       const userData = response.data;
       setUser({
-        id: userData._id, // siempre tendrás user.id
+        id: userData._id,
         username: userData.username,
         email: userData.email,
+        grado: userData.grado,
+        codigo_maestro: userData.codigo_maestro
       });
     } catch (error: any) {
+      console.error("Error al cargar usuario:", error?.response?.data || error);
       setUser(null);
       if (error.response?.status === 401) {
         await AsyncStorage.removeItem("token");
@@ -75,7 +91,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Hook para usar el contexto de autenticación
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

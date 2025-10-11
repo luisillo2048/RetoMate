@@ -1,251 +1,451 @@
-import { StyleSheet } from "react-native";
+// themes/TasksStyles.js
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
-export default StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 16,
-    backgroundColor: '#FFF8F0' 
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = width < 375;
+
+const TasksStyles = StyleSheet.create({
+  container: {
+    flex: 1,
   },
-  titulo: { 
-    fontSize: 24, 
-    fontWeight: 'bold',
-    marginBottom: 16, 
-    color: '#4B3F2F', 
-    textAlign: 'center' 
+  scrollView: {
+    flex: 1,
   },
-  bloqueContainer: { 
-    marginBottom: 16,
-    backgroundColor: '#FFF',
-    borderRadius: 12, 
-    padding: 10,
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3 
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: isSmallScreen ? 12 : 16,
+    paddingTop: Platform.OS === 'ios' ? 50 : 40,
+    paddingBottom: 40, 
   },
-  bloqueBoton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center' 
+  mainScrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: isSmallScreen ? 12 : 16,
+    paddingTop: Platform.OS === 'ios' ? 50 : 40,
+    paddingBottom: 40,
   },
-  bloqueTitulo: { 
-    fontSize: 18, 
-    fontWeight: 'bold',
-    color: '#4B3F2F'
-  },
-  tareaContainer: {
-    backgroundColor: '#F7E9D7',
-    padding: 12, 
-    borderRadius: 8,
-    marginTop: 10 
-  },
-  tareaHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  tareaFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8
-  },
-  tareaPregunta: {
-    fontSize: 16, 
-    fontWeight: '600',
-    color: '#4B3F2F',
-    flex: 1
-  },
-  tareaPuntaje: { 
-    fontSize: 14,
-    color: '#4B3F2F'
-  },
-  tareaDificultad: {
-    fontSize: 12,
-    color: 'white',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    fontWeight: 'bold'
-  },
-  progresoTexto: {
-    marginTop: 4,
-    fontSize: 14, 
-    fontWeight: '600',
-    color: '#4B3F2F',
-    textAlign: 'center' 
-  },
-  tareaCompletada: { 
-    opacity: 0.6 
-  },
-  imagen: {
-    width: '100%',
-    height: 200,
-    marginBottom: 20,
-    borderRadius: 10,
-    alignSelf: 'center',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#8B5CF6',
-  },
-  difficultyBadge: {
-    alignSelf: 'center',
-    marginBottom: 10
-  },
-  difficultyText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: 'white',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    textAlign: 'center'
-  },
-  optionButton: {
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: '#D8B878',
-  },
-  optionText: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#333',
-  },
-  feedbackContainer: {
-    alignItems: 'center',
-    marginTop: 30,
-    padding: 20,
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2
-  },
-  feedbackText: {
-    fontSize: 20,
-    marginTop: 10,
-    color: '#555',
-    textAlign: 'center',
-    fontWeight: 'bold'
-  },
-  correctAnswerText: {
-    fontSize: 16,
-    marginTop: 10,
-    color: '#4B3F2F',
-    textAlign: 'center',
-    fontStyle: 'italic'
-  },
-  nextButton: {
-    backgroundColor: '#8B5CF6',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 15,
-    minWidth: 120,
-  },
-  nextButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
+  bottomSpacer: {
+    height: 100, 
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  titulo: {
+    fontSize: isSmallScreen ? 24 : 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#2D3748',
+  },
+  progressContainer: {
+    backgroundColor: '#FFF',
+    padding: isSmallScreen ? 16 : 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  progressLabel: {
+    fontSize: isSmallScreen ? 16 : 18,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#2D3748',
+  },
+  progressPercentage: {
+    fontSize: isSmallScreen ? 14 : 16,
+    fontWeight: 'bold',
+    textAlign: 'right',
+    marginTop: 8,
+    color: '#4A5568',
+  },
+  bloqueContainer: {
+    marginBottom: 16,
+  },
+  bloqueBoton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: isSmallScreen ? 14 : 16,
+    paddingHorizontal: isSmallScreen ? 16 : 20,
+    borderRadius: 12,
+  },
+  bloqueTitulo: {
+    fontSize: isSmallScreen ? 16 : 18,
+    fontWeight: 'bold',
+    color: '#FFF',
+  },
+  progresoTexto: {
+    fontSize: isSmallScreen ? 12 : 14,
+    marginTop: 8,
+    color: '#4A5568',
+  },
+  iniciarBloqueButton: {
+    paddingVertical: isSmallScreen ? 10 : 12,
+    paddingHorizontal: isSmallScreen ? 16 : 20,
+    borderRadius: 10,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  iniciarBloqueButtonText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  tareaContainer: {
+    backgroundColor: '#FFF',
+    padding: isSmallScreen ? 14 : 16,
+    borderRadius: 10,
+    marginTop: 8,
+    marginHorizontal: 4,
+  },
+  tareaCompletada: {
+    opacity: 0.8,
+  },
+  tareaHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  tareaPregunta: {
+    flex: 1,
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#2D3748',
+    marginRight: 8,
+  },
+  tareaFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  puntajeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tareaPuntaje: {
+    fontSize: isSmallScreen ? 12 : 14,
+    color: '#4A5568',
+    marginLeft: 4,
+  },
+  tareaDificultad: {
+    paddingHorizontal: isSmallScreen ? 8 : 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  dificultadText: {
+    fontSize: isSmallScreen ? 10 : 12,
+    color: '#FFF',
+    fontWeight: '600',
+    textTransform: 'capitalize',
+  },
+  contadorOportunidades: {
+    backgroundColor: '#FFF3CD',
+    padding: isSmallScreen ? 10 : 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FFC107',
+  },
+  contadorTexto: {
+    fontSize: isSmallScreen ? 12 : 14,
+    fontWeight: '600',
+    color: '#856404',
+    textAlign: 'center',
+  },
+  tareaHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+  },
+  backButtonText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#4B3F2F',
+    marginLeft: 4,
+  },
+  tareaInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bloqueBadge: {
+    backgroundColor: '#E2E8F0',
+    paddingHorizontal: isSmallScreen ? 10 : 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  bloqueText: {
+    fontSize: isSmallScreen ? 12 : 14,
+    fontWeight: '600',
+    color: '#4A5568',
+  },
+  difficultyBadge: {
+    paddingHorizontal: isSmallScreen ? 10 : 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  difficultyText: {
+    fontSize: isSmallScreen ? 12 : 14,
+    fontWeight: '600',
+    color: '#FFF',
+    textTransform: 'capitalize',
+  },
+  mensajeEspecialContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF3CD',
+    padding: isSmallScreen ? 12 : 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  mensajeEspecialText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#856404',
+    marginLeft: 8,
+    flex: 1,
+  },
+  imagen: {
+    width: '100%',
+    height: isSmallScreen ? 150 : 200,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  questionHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  title: {
+    flex: 1,
+    fontSize: isSmallScreen ? 18 : 20,
+    fontWeight: '600',
+    color: '#2D3748',
+    marginRight: 12,
+  },
+  audioButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  speakButton: {
+    padding: 8,
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  audioButtonText: {
+    fontSize: 10,
+    color: '#4A5568',
+    marginTop: 4,
+  },
+  optionsContainer: {
+    marginBottom: 20,
+  },
+  optionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: isSmallScreen ? 14 : 16,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  optionText: {
+    flex: 1,
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#2D3748',
+  },
+  selectedOptionText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  correctOptionText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  incorrectOptionText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  audioOptionButton: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  loadingContainer: {
+    alignItems: 'center',
     padding: 20,
   },
-  finishedText: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#4B3F2F',
+  loadingText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#4A5568',
+    marginTop: 8,
+  },
+  feedbackContainer: {
+    alignItems: 'center',
+    padding: isSmallScreen ? 20 : 24,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  feedbackText: {
+    fontSize: isSmallScreen ? 18 : 20,
     fontWeight: 'bold',
+    marginVertical: 12,
+    textAlign: 'center',
+  },
+  correctAnswerText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#4A5568',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  nextButton: {
+    paddingVertical: isSmallScreen ? 12 : 14,
+    paddingHorizontal: isSmallScreen ? 24 : 32,
+    borderRadius: 10,
+    minWidth: isSmallScreen ? 140 : 160,
+    alignItems: 'center',
+  },
+  nextButtonDisabled: {
+    opacity: 0.6,
+  },
+  nextButtonText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  finishedText: {
+    fontSize: isSmallScreen ? 22 : 26,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 16,
+    color: '#2D3748',
   },
   subText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 16 : 18,
     textAlign: 'center',
-    marginTop: 10,
-    color: '#666',
+    color: '#4A5568',
     marginBottom: 30,
   },
   homeButton: {
-    backgroundColor: '#8B5CF6',
-    paddingHorizontal: 30,
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 14 : 16,
+    paddingHorizontal: isSmallScreen ? 24 : 32,
     borderRadius: 10,
-    marginTop: 25,
+    minWidth: isSmallScreen ? 160 : 180,
+    alignItems: 'center',
   },
   homeButtonText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    fontWeight: '600',
     color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
-  // Estilos para el modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: isSmallScreen ? 16 : 20,
   },
   modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
-    alignItems: 'center',
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: isSmallScreen ? 20 : 24,
+    width: '100%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   modalHeader: {
     alignItems: 'center',
-    marginBottom: 15,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#4B3F2F',
-    marginTop: 10,
-  },
-  modalBody: {
-    width: '100%',
     marginBottom: 20,
   },
-  modalText: {
-    fontSize: 16,
-    color: '#555',
+  modalTitle: {
+    fontSize: isSmallScreen ? 20 : 24,
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 15,
+    marginTop: 12,
+    color: '#2D3748',
+  },
+  modalBody: {
+    marginBottom: 24,
+  },
+  modalText: {
+    fontSize: isSmallScreen ? 16 : 18,
+    textAlign: 'center',
+    color: '#4A5568',
+    marginBottom: 16,
   },
   modalInfoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
-    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
   },
   modalInfoLabel: {
-    fontSize: 16,
-    color: '#4B3F2F',
-    fontWeight: '600',
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#4A5568',
   },
   modalInfoValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: isSmallScreen ? 14 : 16,
+    fontWeight: '600',
   },
-  modalButton: {
-    backgroundColor: '#8B5CF6',
-    padding: 12,
-    borderRadius: 8,
-    width: '100%',
+  pointsContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
+  benefitsContainer: {
+    marginTop: 16,
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    padding: 12,
+    backgroundColor: '#F7FAFC',
+    borderRadius: 8,
+  },
+  benefitText: {
+    fontSize: isSmallScreen ? 14 : 16,
+    color: '#4A5568',
+    marginLeft: 12,
+    flex: 1,
+  },
+  modalButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: isSmallScreen ? 12 : 14,
+    borderRadius: 10,
+  },
   modalButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
+    fontWeight: '600',
+    color: '#FFF',
+    marginLeft: 8,
   },
 });
+
+export default TasksStyles;

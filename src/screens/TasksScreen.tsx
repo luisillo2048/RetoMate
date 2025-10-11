@@ -1,34 +1,44 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator, Image, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator, Alert, Dimensions, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
-import Collapsible from 'react-native-collapsible';
+import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import * as Speech from 'expo-speech';
+
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { useTareas } from '../hooks/useTareas';
+import BloqueCard  from '../components/BloqueCard';
+import TareaDetalle from '../components/TareaDetalle';
+import LogroModal from '../components/LogroModal';
+
+import { Tarea } from '../types';
+import { verificarYDesbloquearLogros, normalizarDificultad, getDifficultyColor } from '../utils/storage';
+import { stopSpeech } from '../utils/speech';
 import styles from '../themes/TasksStyles';
+
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
-interface Tarea {
-  _id: string;
-  pregunta: string;
-  puntaje: number;
-  dificultad?: string;
-  opciones?: string[];
-  respuestaCorrecta?: string;
-  imagen?: string;
-}
-
 const TasksScreen = () => {
-  const { user } = useAuth();
-  const [refreshing, setRefreshing] = useState(false);
-  const [tareasPorBloque, setTareasPorBloque] = useState<Record<number, Tarea[]>>({});
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+  
+  // Estados del hook de tareas
+  const {
+    refreshing,
+    tareasPorBloque,
+    progreso,
+    tareasRespondidasIds,
+    bloques,
+    onRefresh,
+    setProgreso
+  } = useTareas();
+
+  // Estados de la UI
   const [bloqueActivo, setBloqueActivo] = useState<number | null>(null);
-  const [progreso, setProgreso] = useState<any[]>([]);
   const [bloquesDesbloqueados, setBloquesDesbloqueados] = useState<number[]>([1]);
   const [tareaActual, setTareaActual] = useState<Tarea | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -38,70 +48,17 @@ const TasksScreen = () => {
   const [tareasCompletadas, setTareasCompletadas] = useState(false);
   const [mostrarRespuesta, setMostrarRespuesta] = useState(false);
   const [bloquearOpciones, setBloquearOpciones] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [bloqueCompletado, setBloqueCompletado] = useState(false);
+  const [mensajeEspecial, setMensajeEspecial] = useState<string | null>(null);
+  const [logroDesbloqueado, setLogroDesbloqueado] = useState<any>(null);
+  const [showLogroModal, setShowLogroModal] = useState(false);
 
-  const bloques = [1, 2, 3, 4, 5, 6];
+  // Estados para el sistema de 3 oportunidades
+  const [erroresConsecutivos, setErroresConsecutivos] = useState(0);
+  const [showChatbotModal, setShowChatbotModal] = useState(false);
 
-  const leerTexto = (texto: string) => {
-    if (isSpeaking) {
-      Speech.stop();
-      setIsSpeaking(false);
-    }
-    Speech.speak(texto, {
-      language: 'es-ES',
-      onStart: () => setIsSpeaking(true),
-      onDone: () => setIsSpeaking(false),
-      onStopped: () => setIsSpeaking(false),
-    });
-  };
-
-  useEffect(() => {
-    return () => {
-      Speech.stop();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (tareaActual) {
-      leerTexto(tareaActual.pregunta);
-    }
-  }, [tareaActual]);
-
-  const loadData = useCallback(async () => {
-    try {
-      await Promise.all(
-        bloques.map(async (bloque) => {
-          const response = await axios.get(`${apiUrl}/tarea/tareas/bloque/${bloque}`);
-          setTareasPorBloque((prev) => ({ ...prev, [bloque]: response.data }));
-        })
-      );
-
-      if (user) {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-          const progresoResponse = await axios.get(`${apiUrl}/progreso/progreso/${user.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setProgreso(progresoResponse.data);
-        }
-      }
-    } catch (error) {
-      console.error('Error al cargar datos:', error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    loadData();
-  }, [loadData]);
-
+  // Efecto para desbloquear bloques
   useEffect(() => {
     const nuevosDesbloqueados = [1];
 
@@ -121,16 +78,15 @@ const TasksScreen = () => {
     setBloquesDesbloqueados(nuevosDesbloqueados);
   }, [progreso, tareasPorBloque]);
 
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      stopSpeech();
+    };
+  }, []);
+
   const toggleBloque = (bloque: number) => {
     setBloqueActivo(bloqueActivo === bloque ? null : bloque);
-  };
-
-  const calcularProgresoBloque = (bloque: number) => {
-    const tareas = tareasPorBloque[bloque] || [];
-    const completadas = tareas.filter((tarea) =>
-      progreso.find((p) => p.id_tarea?._id === tarea._id)
-    );
-    return tareas.length > 0 ? completadas.length / tareas.length : 0;
   };
 
   const calcularProgresoTotal = () => {
@@ -148,79 +104,181 @@ const TasksScreen = () => {
     return totalTareas > 0 ? totalCompletadas / totalTareas : 0;
   };
 
-  const getDifficultyColor = (dificultad?: string) => {
-    switch (dificultad?.toLowerCase()) {
-      case 'fácil':
-      case 'facil':
-        return '#4CAF50';
-      case 'media':
-      case 'intermedio':
-        return '#FFC107';
-      case 'difícil':
-      case 'dificil':
-      case 'avanzado':
-        return '#F44336';
-      default:
-        return '#9E9E9E';
-    }
+  // Función para manejar el chatbot - navegar al MenuScreen
+  const irAlChatbot = () => {
+    setShowChatbotModal(false);
+    setErroresConsecutivos(0);
+    resetGameState();
+    setTareaActual(null);
+    navigation.navigate('Menu' as never);
   };
 
-  const verificarRespuesta = (opcion: string) => {
+  const verificarRespuesta = async (opcion: string) => {
     if (!tareaActual || bloquearOpciones) return;
     
     setLoading(true);
     setSelected(opcion);
     setBloquearOpciones(true);
 
-    setTimeout(async () => {
-      try {
-        const respuestaUsuario = opcion.trim().toLowerCase();
-        const respuestaCorrecta = tareaActual.respuestaCorrecta?.trim().toLowerCase() || '';
-        const esCorrecta = respuestaUsuario === respuestaCorrecta;
+    try {
+      const respuestaUsuario = opcion.trim().toLowerCase();
+      const respuestaCorrecta = tareaActual.respuestaCorrecta?.trim().toLowerCase() || '';
+      const esCorrecta = respuestaUsuario === respuestaCorrecta;
 
-        setCorrecta(esCorrecta);
-        setRespondido(true);
-        setMostrarRespuesta(true);
-        setLoading(false);
+      setCorrecta(esCorrecta);
+      setRespondido(true);
+      setMostrarRespuesta(true);
 
-        if (esCorrecta) {
-          setShowCompletionModal(true);
+      // Lógica de 3 oportunidades
+      if (esCorrecta) {
+        setErroresConsecutivos(0);
+        setShowCompletionModal(true);
+      } else {
+        const nuevosErrores = erroresConsecutivos + 1;
+        setErroresConsecutivos(nuevosErrores);
+        
+        if (nuevosErrores >= 3) {
+          setTimeout(() => {
+            setShowChatbotModal(true);
+          }, 1500);
         }
-      } catch (error) {
-        console.error('Error al verificar respuesta:', error);
-        setLoading(false);
-        setBloquearOpciones(false);
       }
-    }, 1000);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo verificar la respuesta');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // FUNCIÓN CORREGIDA: Buscar siguiente tarea sin repetir las ya contestadas
+  const buscarSiguienteTarea = async (bloqueActual: number, dificultadSugerida: string) => {
+    try {
+      const tareasBloque = tareasPorBloque[bloqueActual] || [];
+      
+      // Filtrar solo tareas NO respondidas
+      const tareasNoRespondidas = tareasBloque.filter(tarea => 
+        !tareasRespondidasIds.has(tarea._id)
+      );
+
+      if (tareasNoRespondidas.length === 0) {
+        return null; // No hay más tareas en este bloque
+      }
+
+      const dificultadNormalizada = normalizarDificultad(dificultadSugerida);
+
+      // Buscar tarea de la dificultad sugerida que NO haya sido respondida
+      let siguienteTarea = tareasNoRespondidas.find(tarea => {
+        const tareaDificultad = normalizarDificultad(tarea.dificultad || 'facil');
+        return tareaDificultad === dificultadNormalizada;
+      });
+
+      // Si no encuentra de la dificultad sugerida, buscar cualquier tarea no respondida
+      if (!siguienteTarea) {
+        // Prioridad: media -> facil -> dificil
+        const prioridades = ['media', 'facil', 'dificil'];
+        for (const dificultad of prioridades) {
+          siguienteTarea = tareasNoRespondidas.find(t => 
+            normalizarDificultad(t.dificultad || 'facil') === dificultad
+          );
+          if (siguienteTarea) break;
+        }
+      }
+
+      // Si aún no encuentra, tomar la primera tarea no respondida
+      if (!siguienteTarea && tareasNoRespondidas.length > 0) {
+        siguienteTarea = tareasNoRespondidas[0];
+      }
+
+      return siguienteTarea;
+
+    } catch (error) {
+      console.error('Error buscando siguiente tarea:', error);
+      return null;
+    }
   };
 
   const handleContinuar = async () => {
-    if (!tareaActual) return;
+    if (!tareaActual || !selected) return;
     
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
-      if (token && tareaActual._id) {
-        const response = await axios.post(
-          `${apiUrl}/tarea/${tareaActual._id}/responder`,
-          { respuesta: selected, correcta },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+      if (token) {
+        if (correcta) {
+          const response = await axios.post(
+            `${apiUrl}/tarea/${tareaActual._id}/responder`,
+            { 
+              respuesta: selected
+            },
+            { 
+              headers: { Authorization: `Bearer ${token}` } 
+            }
+          );
 
-        const { siguiente_tarea, bloque_completado } = response.data;
+          const { 
+            siguiente_tarea, 
+            logroDesbloqueado,
+            siguiente_dificultad,
+            mensaje 
+          } = response.data;
 
-        if (siguiente_tarea) {
-          setTareaActual(siguiente_tarea);
-          resetGameState();
-        } else if (bloque_completado) {
-          setTareasCompletadas(true);
+          // 🔥 ACTUALIZAR PROGRESO LOCALMENTE
+          if (correcta) {
+            setProgreso(prev => [...prev, { id_tarea: { _id: tareaActual._id } }]);
+          }
+
+          // 🔥 NUEVO: Verificar y desbloquear logros automáticamente
+          const nuevoLogro = await verificarYDesbloquearLogros();
+          if (nuevoLogro) {
+            setLogroDesbloqueado(nuevoLogro);
+            setShowLogroModal(true);
+          }
+
+          if (siguiente_tarea) {
+            setTareaActual(siguiente_tarea);
+            resetGameState();
+          } else {
+            const bloqueActual = tareaActual.bloque || 1;
+            const tareaAlternativa = await buscarSiguienteTarea(bloqueActual, siguiente_dificultad);
+            
+            if (tareaAlternativa) {
+              setTareaActual(tareaAlternativa);
+              resetGameState();
+            } else {
+              setBloqueCompletado(true);
+              setTareasCompletadas(true);
+              resetGameState();
+              setTareaActual(null);
+              
+              Alert.alert(
+                '¡Bloque Completado! 🎉', 
+                'Has completado todas las tareas de este bloque.'
+              );
+            }
+          }
         } else {
-          resetGameState();
-          await loadData();
+          // Si respondió mal, buscar siguiente tarea sin repetir
+          const bloqueActual = tareaActual.bloque || 1;
+          const tareaAlternativa = await buscarSiguienteTarea(bloqueActual, 'facil');
+          
+          if (tareaAlternativa) {
+            setTareaActual(tareaAlternativa);
+            resetGameState();
+          } else {
+            setBloqueCompletado(true);
+            setTareasCompletadas(true);
+            resetGameState();
+            setTareaActual(null);
+            
+            Alert.alert(
+              '¡Bloque Completado! 🎉', 
+              'Has completado todas las tareas de este bloque.'
+            );
+          }
         }
       }
-    } catch (error) {
-      console.error('Error al guardar progreso:', error);
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.error || 'No se pudo guardar el progreso');
     } finally {
       setLoading(false);
       setShowCompletionModal(false);
@@ -228,213 +286,135 @@ const TasksScreen = () => {
   };
 
   const resetGameState = () => {
-    setTareaActual(null);
     setSelected(null);
     setRespondido(false);
     setCorrecta(false);
     setMostrarRespuesta(false);
     setBloquearOpciones(false);
+    setMensajeEspecial(null);
   };
 
-  const getImageUrl = (imagePath: string) => {
-    if (!imagePath) return null;
-    
-    if (/^https?:\/\//i.test(imagePath)) {
-      return imagePath;
+  const iniciarTareaDesdeBloque = async (bloque: number) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        Alert.alert('Error', 'No se pudo autenticar');
+        return;
+      }
+
+      const tareasBloque = tareasPorBloque[bloque] || [];
+      
+      // Buscar PRIMERO tareas fáciles NO respondidas
+      let tareaParaIniciar = tareasBloque.find(tarea => {
+        const noRespondida = !tareasRespondidasIds.has(tarea._id);
+        const esFacil = normalizarDificultad(tarea.dificultad || 'facil') === 'facil';
+        return noRespondida && esFacil;
+      });
+
+      // Si no hay fáciles, buscar cualquier tarea NO respondida
+      if (!tareaParaIniciar) {
+        tareaParaIniciar = tareasBloque.find(tarea => 
+          !tareasRespondidasIds.has(tarea._id)
+        );
+      }
+
+      if (tareaParaIniciar) {
+        setTareaActual(tareaParaIniciar);
+        setTareasCompletadas(false);
+        setBloqueCompletado(false);
+        setErroresConsecutivos(0);
+        resetGameState();
+      } else {
+        Alert.alert(
+          'Bloque Completado', 
+          '¡Ya has completado todas las tareas de este bloque!'
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo iniciar la tarea');
     }
-    
-    const baseUrl = apiUrl?.startsWith('http') ? apiUrl : `https://${apiUrl}`;
-    return `${baseUrl}/${imagePath.replace(/^\//, '')}`;
   };
 
-  const renderTareasDeBloque = (bloque: number) => {
-    const tareas = tareasPorBloque[bloque] || [];
-    const progresoBloque = calcularProgresoBloque(bloque);
-    const desbloqueado = bloquesDesbloqueados.includes(bloque);
-    const completadas = tareas.filter((tarea) =>
-      progreso.find((p) => p.id_tarea?._id === tarea._id)
-    );
-
-    return (
-      <View key={bloque} style={styles.bloqueContainer}>
-        <TouchableOpacity onPress={() => toggleBloque(bloque)} disabled={!desbloqueado}>
-          <Animatable.View
-            animation={desbloqueado && bloqueActivo !== bloque ? 'bounceIn' : undefined}
-            style={[styles.bloqueBoton, { backgroundColor: desbloqueado ? '#DBA975' : '#ccc' }]}
-          >
-            <Text style={styles.bloqueTitulo}>
-              {desbloqueado ? '🔓' : '🔒'} Bloque {bloque}
-            </Text>
-          </Animatable.View>
-        </TouchableOpacity>
-
-        <Progress.Bar
-          progress={progresoBloque}
-          width={null}
-          height={10}
-          color="#4B3F2F"
-          borderWidth={0}
-          style={{ marginTop: 10 }}
-        />
-
-        <Text style={styles.progresoTexto}>
-          Progreso: {completadas.length}/{tareas.length} ({Math.round(progresoBloque * 100)}%)
-        </Text>
-
-        <Collapsible collapsed={bloqueActivo !== bloque}>
-          {tareas.map((tarea) => {
-            const completada = progreso.find((p) => p.id_tarea?._id === tarea._id);
-            return (
-              <TouchableOpacity
-                key={tarea._id}
-                style={[styles.tareaContainer, completada && styles.tareaCompletada]}
-                onPress={() => {
-                  if (!completada) {
-                    setTareaActual(tarea);
-                  }
-                }}
-                activeOpacity={completada ? 1 : 0.7}
-                disabled={!!completada}
-              >
-                <View style={styles.tareaHeader}>
-                  <Text style={styles.tareaPregunta}>{tarea.pregunta}</Text>
-                  {completada && <FontAwesome name="check-circle" size={20} color="#4CAF50" />}
-                </View>
-                <View style={styles.tareaFooter}>
-                  <Text style={styles.tareaPuntaje}>Puntaje: {tarea.puntaje}</Text>
-                  {tarea.dificultad && (
-                    <Text style={[styles.tareaDificultad, { 
-                      backgroundColor: getDifficultyColor(tarea.dificultad) 
-                    }]}>
-                      {tarea.dificultad}
-                    </Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </Collapsible>
-      </View>
-    );
+  const handleSelectTarea = (tarea: Tarea) => {
+    setTareaActual(tarea);
+    setErroresConsecutivos(0);
+    resetGameState();
   };
 
-  if (tareasCompletadas) {
+  const handleVolver = () => {
+    resetGameState();
+    setTareaActual(null);
+    setErroresConsecutivos(0);
+  };
+
+  if (tareasCompletadas || bloqueCompletado) {
     return (
-      <View style={styles.centered}>
-        <Ionicons name="trophy" size={80} color="#FFD700" />
-        <Text style={styles.finishedText}>¡Bloque completado con éxito! 🎉</Text>
-        <Text style={styles.subText}>Has terminado todas las tareas de este bloque</Text>
-        <TouchableOpacity 
-          style={styles.homeButton} 
-          onPress={() => {
-            setTareasCompletadas(false);
-            loadData();
-          }}
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        <Animatable.View
+          animation="bounceIn"
+          duration={1000}
         >
-          <Text style={styles.homeButtonText}>Volver a Tareas</Text>
-        </TouchableOpacity>
+          <Ionicons name="trophy" size={100} color="#FFD700" />
+        </Animatable.View>
+        <Animatable.Text 
+          animation="fadeInUp" 
+          duration={800}
+          style={styles.finishedText}
+        >
+          ¡Bloque completado con éxito! 🎉
+        </Animatable.Text>
+        <Animatable.Text 
+          animation="fadeInUp" 
+          duration={800}
+          delay={200}
+          style={styles.subText}
+        >
+          Eres un super estudiante 🌟
+        </Animatable.Text>
+        
+        <Animatable.View
+          animation="fadeInUp"
+          duration={800}
+          delay={400}
+        >
+          <TouchableOpacity 
+            style={[styles.homeButton, {
+              backgroundColor: colors.primary,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 6,
+            }]} 
+            onPress={() => {
+              setTareasCompletadas(false);
+              setBloqueCompletado(false);
+              onRefresh();
+            }}
+          >
+            <Text style={styles.homeButtonText}>Volver a la Aventura</Text>
+          </TouchableOpacity>
+        </Animatable.View>
       </View>
     );
   }
 
   if (tareaActual) {
-    const imageUrl = getImageUrl(tareaActual.imagen || '');
-
     return (
-      <View style={styles.container}>
-        <ScrollView 
-          contentContainerStyle={{ flexGrow: 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={['#DBA975']}
-              tintColor="#DBA975"
-            />
-          }
-        >
-          {imageUrl && (
-            <Image 
-              source={{ uri: imageUrl }} 
-              style={styles.imagen}
-              resizeMode="contain"
-              onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error)}
-            />
-          )}
-          
-          <View style={styles.questionHeader}>
-            <Text style={styles.title}>{tareaActual.pregunta}</Text>
-            <TouchableOpacity onPress={() => leerTexto(tareaActual.pregunta)}>
-              <Ionicons 
-                name={isSpeaking ? 'volume-high' : 'volume-medium'} 
-                size={24} 
-                color="#4B3F2F" 
-              />
-            </TouchableOpacity>
-          </View>
-
-          {tareaActual.dificultad && (
-            <View style={styles.difficultyContainer}>
-              <Text style={[styles.difficultyText, { 
-                backgroundColor: getDifficultyColor(tareaActual.dificultad) 
-              }]}>
-                Dificultad: {tareaActual.dificultad}
-              </Text>
-            </View>
-          )}
-
-          {tareaActual.opciones?.map((opcion, index) => {
-            const isSelected = selected === opcion;
-            const isCorrect = opcion === tareaActual.respuestaCorrecta;
-
-            let backgroundColor = '#F0F0F0';
-            if (respondido && mostrarRespuesta) {
-              if (isSelected && isCorrect) backgroundColor = '#A2F2B2';
-              else if (isSelected && !isCorrect) backgroundColor = '#F2A2A2';
-              else if (isCorrect) backgroundColor = '#CFFFCF';
-            } else if (isSelected) {
-              backgroundColor = '#E0E0E0';
-            }
-
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[styles.optionButton, { backgroundColor }]}
-                disabled={respondido || loading || bloquearOpciones}
-                onPress={() => verificarRespuesta(opcion)}
-                onLongPress={() => leerTexto(opcion)}
-              >
-                <Text style={styles.optionText}>{opcion}</Text>
-              </TouchableOpacity>
-            );
-          })}
-
-          {loading && <ActivityIndicator size="large" color="#BB86F2" style={{ marginTop: 20 }} />}
-
-          {respondido && mostrarRespuesta && (
-            <View style={styles.feedbackContainer}>
-              <Ionicons
-                name={correcta ? 'checkmark-circle' : 'close-circle'}
-                size={64}
-                color={correcta ? '#4CAF50' : '#F44336'}
-              />
-              <Text style={styles.feedbackText}>
-                {correcta ? '¡Respuesta Correcta! 🎉' : 'Respuesta Incorrecta 😕'}
-              </Text>
-              <Text style={styles.correctAnswerText}>
-                La respuesta correcta es: {tareaActual.respuestaCorrecta}
-              </Text>
-              
-              <TouchableOpacity
-                style={styles.nextButton}
-                onPress={handleContinuar}
-                disabled={loading}
-              >
-                <Text style={styles.nextButtonText}>Continuar</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </ScrollView>
+      <>
+        <TareaDetalle
+          tareaActual={tareaActual}
+          selected={selected}
+          respondido={respondido}
+          correcta={correcta}
+          loading={loading}
+          mostrarRespuesta={mostrarRespuesta}
+          bloquearOpciones={bloquearOpciones}
+          erroresConsecutivos={erroresConsecutivos}
+          onVerificarRespuesta={verificarRespuesta}
+          onVolver={handleVolver}
+          onContinuar={handleContinuar}
+        />
 
         {/* Modal de Tarea Completada */}
         <Modal
@@ -444,65 +424,197 @@ const TasksScreen = () => {
           onRequestClose={() => setShowCompletionModal(false)}
         >
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContainer}>
+            <Animatable.View 
+              style={styles.modalContainer}
+              animation="bounceIn"
+              duration={600}
+            >
               <View style={styles.modalHeader}>
                 <Ionicons name="checkmark-done-circle" size={50} color="#4CAF50" />
                 <Text style={styles.modalTitle}>¡Tarea Completada!</Text>
               </View>
               
               <View style={styles.modalBody}>
-                <Text style={styles.modalText}>Has completado esta tarea correctamente</Text>
+                <Text style={styles.modalText}>¡Eres un genio! 🌟</Text>
                 
                 <View style={styles.modalInfoContainer}>
                   <Text style={styles.modalInfoLabel}>Dificultad:</Text>
                   <Text style={[styles.modalInfoValue, { 
-                    color: getDifficultyColor(tareaActual?.dificultad) 
+                    color: getDifficultyColor(tareaActual.dificultad) 
                   }]}>
-                    {tareaActual?.dificultad || 'N/A'}
+                    {normalizarDificultad(tareaActual.dificultad || 'facil')}
                   </Text>
                 </View>
                 
                 <View style={styles.modalInfoContainer}>
                   <Text style={styles.modalInfoLabel}>Puntos ganados:</Text>
-                  <Text style={styles.modalInfoValue}>{tareaActual?.puntaje || 0}</Text>
+                  <View style={styles.pointsContainer}>
+                    <Ionicons name="star" size={20} color="#FFD700" />
+                    <Text style={styles.modalInfoValue}>{tareaActual?.puntaje || 0}</Text>
+                  </View>
                 </View>
               </View>
               
               <TouchableOpacity
-                style={styles.modalButton}
+                style={[styles.modalButton, {
+                  backgroundColor: colors.primary,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4,
+                  elevation: 5,
+                }]}
                 onPress={handleContinuar}
+                disabled={loading}
               >
-                <Text style={styles.modalButtonText}>Aceptar</Text>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <Text style={styles.modalButtonText}>Continuar Aventura</Text>
+                )}
               </TouchableOpacity>
-            </View>
+            </Animatable.View>
           </View>
         </Modal>
-      </View>
+
+        {/* Modal de Logro Desbloqueado */}
+        <LogroModal
+          visible={showLogroModal}
+          logro={logroDesbloqueado}
+          onClose={() => setShowLogroModal(false)}
+        />
+
+        {/* Modal de Invitación al Chatbot */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={showChatbotModal}
+          onRequestClose={() => setShowChatbotModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <Animatable.View 
+              style={[styles.modalContainer, { backgroundColor: '#FFF' }]}
+              animation="bounceIn"
+              duration={600}
+            >
+              <View style={styles.modalHeader}>
+                <Ionicons name="school" size={50} color={colors.secondary} />
+                <Text style={styles.modalTitle}>¡Te invitamos a practicar! 📚</Text>
+              </View>
+              
+              <View style={styles.modalBody}>
+                <Text style={styles.modalText}>
+                  Notamos que estás teniendo dificultades. ¿Por qué no practicas con nuestro asistente virtual?
+                </Text>
+                
+                <View style={styles.benefitsContainer}>
+                  <View style={styles.benefitItem}>
+                    <Ionicons name="bulb" size={20} color="#FFD700" />
+                    <Text style={styles.benefitText}>Explicaciones paso a paso</Text>
+                  </View>
+                  <View style={styles.benefitItem}>
+                    <Ionicons name="heart" size={20} color={colors.primary} />
+                    <Text style={styles.benefitText}>Aprendizaje personalizado</Text>
+                  </View>
+                  <View style={styles.benefitItem}>
+                    <Ionicons name="rocket" size={20} color={colors.secondary} />
+                    <Text style={styles.benefitText}>Mejora tus habilidades</Text>
+                  </View>
+                </View>
+              </View>
+              
+              <View style={styles.modalButtonsContainer}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { 
+                    backgroundColor: colors.secondary,
+                    marginRight: 10 
+                  }]}
+                  onPress={irAlChatbot}
+                >
+                  <Ionicons name="chatbubbles" size={20} color="#FFF" />
+                  <Text style={styles.modalButtonText}>Ir al Asistente</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={[styles.modalButton, { 
+                    backgroundColor: colors.primary,
+                    marginLeft: 10 
+                  }]}
+                  onPress={() => {
+                    setShowChatbotModal(false);
+                    setErroresConsecutivos(0);
+                    resetGameState();
+                    setTareaActual(null);
+                  }}
+                >
+                  <Ionicons name="close" size={20} color="#FFF" />
+                  <Text style={styles.modalButtonText}>Quizás después</Text>
+                </TouchableOpacity>
+              </View>
+            </Animatable.View>
+          </View>
+        </Modal>
+      </>
     );
   }
 
   return (
     <ScrollView 
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.mainScrollContent}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          colors={['#DBA975']}
-          tintColor="#DBA975"
+          colors={[colors.primary]}
+          tintColor={colors.primary}
         />
       }
+      showsVerticalScrollIndicator={true}
     >
-      <Text style={styles.titulo}>Tareas por Bloque</Text>
-      <Progress.Bar
-        progress={calcularProgresoTotal()}
-        width={null}
-        height={12}
-        color="#4B3F2F"
-        borderWidth={0}
-        style={{ marginBottom: 20 }}
-      />
-      {bloques.map((bloque) => renderTareasDeBloque(bloque))}
+      <Animatable.View
+        animation="fadeInDown"
+        duration={800}
+      >
+        <Text style={styles.titulo}>Aventura de Aprendizaje 🎒</Text>
+      </Animatable.View>
+      
+      <Animatable.View
+        animation="fadeInUp"
+        duration={800}
+        delay={200}
+        style={styles.progressContainer}
+      >
+        <Text style={styles.progressLabel}>Progreso Total</Text>
+        <Progress.Bar
+          progress={calcularProgresoTotal()}
+          width={null}
+          height={12}
+          color={colors.secondary}
+          borderWidth={0}
+        />
+        <Text style={styles.progressPercentage}>
+          {Math.round(calcularProgresoTotal() * 100)}%
+        </Text>
+      </Animatable.View>
+
+      {bloques.map((bloque) => (
+        <BloqueCard
+          key={bloque}
+          bloque={bloque}
+          tareas={tareasPorBloque[bloque] || []}
+          progreso={progreso}
+          desbloqueado={bloquesDesbloqueados.includes(bloque)}
+          bloqueActivo={bloqueActivo}
+          onToggleBloque={toggleBloque}
+          onIniciarTarea={iniciarTareaDesdeBloque}
+          onSelectTarea={handleSelectTarea}
+          tareasRespondidasIds={tareasRespondidasIds}
+        />
+      ))}
+      
+      {/* Espacio extra para asegurar que se pueda scrollear completamente */}
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 };
