@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import {View,Text,TextInput,TouchableOpacity,ScrollView,Image,Alert,Animated,Dimensions,StyleSheet,} from "react-native";
+import {View,Text,TextInput,TouchableOpacity,ScrollView,Image,Alert,Animated,Dimensions,StyleSheet, AccessibilityInfo,} from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Audio } from 'expo-av';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useTheme } from "../context/ThemeContext";
 import { registerUser } from "../api/auth";
 import styles from "../themes/RegisterStyles";
+import commonStyles from "../themes/Styles";
 import { Picker } from "@react-native-picker/picker";
 
 const burbujaImage = require("../../assets/images/animacionRegister.png");
@@ -24,6 +27,7 @@ type RegisterScreenNavigationProp = StackNavigationProp<
 const RegisterScreen = () => {
   const { theme } = useTheme();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
+  const insets = useSafeAreaInsets();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,33 +50,127 @@ const RegisterScreen = () => {
       size: 30 + Math.random() * 110,
     }))
   ).current;
+  // control de pausa para las burbujas
+  const animationsActiveRef = useRef(true);
+  const [animationsPaused, setAnimationsPaused] = useState(false);
+  const [soundPaused, setSoundPaused] = useState(false);
+  const [systemReduceMotion, setSystemReduceMotion] = useState(false);
+  const soundRef = useRef<Audio.Sound | null>(null);
 
-  useEffect(() => {
-    const animationRefs: Animated.CompositeAnimation[] = [];
+  const welcomeSound = require("../../assets/audios/welcome.mp3");
 
+  const startAllBurbujas = () => {
+    animationsActiveRef.current = true;
     burbujasRef.forEach((burbuja) => {
       const animateBurbuja = () => {
-        const anim = Animated.timing(burbuja.animation, {
+        if (!animationsActiveRef.current) return;
+        Animated.timing(burbuja.animation, {
           toValue: 1,
           duration: 8000 + Math.random() * 7000,
           delay: burbuja.delay,
           useNativeDriver: true,
-        });
-
-        const animationInstance = anim.start(() => {
+        }).start(() => {
+          if (!animationsActiveRef.current) return;
           burbuja.animation.setValue(0);
           animateBurbuja();
         });
-
-        animationRefs.push(animationInstance);
       };
       animateBurbuja();
     });
+  };
+
+  const stopAllBurbujas = () => {
+    animationsActiveRef.current = false;
+    burbujasRef.forEach((burbuja) => {
+      try {
+        burbuja.animation.stopAnimation();
+      } catch (e) {}
+    });
+  };
+
+  useEffect(() => {
+    // Detectar preferencia del sistema para reducir animaciones
+    AccessibilityInfo.isReduceMotionEnabled().then(enabled => {
+      setSystemReduceMotion(enabled);
+      if (enabled) {
+        stopAllBurbujas();
+        setAnimationsPaused(true);
+      }
+    });
+
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      enabled => {
+        setSystemReduceMotion(enabled);
+        if (enabled) {
+          stopAllBurbujas();
+          setAnimationsPaused(true);
+        }
+      }
+    );
+
+    // iniciar animaciones y audio si no hay preferencia de reducir movimiento
+    const setup = async () => {
+      if (!systemReduceMotion && !animationsPaused) {
+        startAllBurbujas();
+      }
+
+        try {
+          const s = new Audio.Sound();
+          // loadAsync usando require
+          await s.loadAsync(welcomeSound);
+          soundRef.current = s;
+          await s.playAsync();
+          setSoundPaused(false);
+        } catch (error) {
+        console.log('Error al cargar audio en RegisterScreen:', error);
+      }
+    };
+
+    setup();
 
     return () => {
-      animationRefs.forEach((anim) => anim?.stop());
+      subscription.remove();
+      stopAllBurbujas();
+      if (soundRef.current) {
+        soundRef.current.unloadAsync().catch(() => {});
+        soundRef.current = null;
+      }
     };
   }, []);
+
+  const toggleAnimations = () => {
+    if (!animationsPaused) {
+      stopAllBurbujas();
+      setAnimationsPaused(true);
+    } else {
+      startAllBurbujas();
+      setAnimationsPaused(false);
+    }
+  };
+
+  const toggleSound = () => {
+    try {
+      const s = soundRef.current;
+      if (!s) {
+        setSoundPaused((v) => !v);
+        return;
+      }
+      s.getStatusAsync().then((status: any) => {
+        if (status.isLoaded) {
+          if (status.isPlaying) {
+            s.pauseAsync();
+            setSoundPaused(true);
+          } else {
+            s.playAsync();
+            setSoundPaused(false);
+          }
+        }
+      }).catch((err: any) => console.log('Error status audio toggle:', err));
+    } catch (e) {
+      setSoundPaused((v) => !v);
+    }
+  };
 
   const handleRegister = async () => {
     if (!username || !password || !confirmPassword || !grado) {
@@ -103,6 +201,7 @@ const RegisterScreen = () => {
     const passwd2Ref = useRef<TextInput>(null);
 
   return (
+    <SafeAreaView style={[styles.container, { flex: 1 }]}> 
     <ScrollView
       contentContainerStyle={styles.scrollContainer}
       style={[
@@ -110,6 +209,24 @@ const RegisterScreen = () => {
         theme === "light" ? styles.lightContainer : styles.darkContainer,
       ]}
     >
+      {/* controles superiores: pausar animaciones / sonido */}
+  <View style={[commonStyles.topControlsRow, { marginTop: insets.top }]} pointerEvents="box-none">
+        <TouchableOpacity
+          onPress={toggleAnimations}
+          style={[commonStyles.pauseButton, animationsPaused ? commonStyles.pauseButtonSelected : null]}
+        >
+          <MaterialCommunityIcons name="animation" size={20} color={animationsPaused ? 'gray' : 'black'} />
+          <Text style={commonStyles.pauseButtonText}>{animationsPaused ? 'Reanudar' : 'Pausar'}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={toggleSound}
+          style={[commonStyles.pauseButton, soundPaused ? commonStyles.pauseButtonSelected : null]}
+        >
+          <MaterialCommunityIcons name={soundPaused ? 'volume-off' : 'volume-high'} size={20} color={soundPaused ? 'gray' : 'black'} />
+          <Text style={commonStyles.pauseButtonText}>{soundPaused ? 'Reanudar' : 'Silenciar'}</Text>
+        </TouchableOpacity>
+      </View>
       {/* Fondo animado */}
       <View style={[StyleSheet.absoluteFill, styles.bubblesContainer]}>
         {burbujasRef.map((burbuja, index) => {
@@ -153,7 +270,7 @@ const RegisterScreen = () => {
       <View style={styles.mainBox}>
         <Image
           source={registerImage}
-          style={styles.headerImage}
+          style={styles.headerImage as any}
           resizeMode="contain"
         />
 
@@ -312,6 +429,7 @@ const RegisterScreen = () => {
         </View>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 

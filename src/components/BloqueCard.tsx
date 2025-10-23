@@ -5,7 +5,7 @@ import Collapsible from 'react-native-collapsible';
 import * as Animatable from 'react-native-animatable';
 import * as Progress from 'react-native-progress';
 import { useTheme } from '../context/ThemeContext';
-import { Tarea } from '../types';
+import { Tarea } from '../types/tarea';
 import TareaCard from './TareaCard';
 import styles from '../themes/TasksStyles';
 
@@ -103,8 +103,9 @@ const BloqueCard = ({
       <Collapsible collapsed={bloqueActivo !== bloque}>
         {tareas.map((tarea, index) => {
           const completada = progreso.find((p) => p.id_tarea?._id === tarea._id);
+          // CORREGIDO: Sin acento en "dificil"
           const dificultadNormalizada = tarea.dificultad ? 
-            tarea.dificultad.toLowerCase().replace('í', 'i') : 'facil';
+            tarea.dificultad.toLowerCase().replace('í', 'i').replace('ó', 'o') : 'facil';
           
           return (
             <TareaCard

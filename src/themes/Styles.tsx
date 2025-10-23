@@ -61,4 +61,39 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  pauseButton: {
+    // Removed absolute positioning so buttons laid out by topControlsRow
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    minHeight: 44,
+    // allow buttons to size horizontally; add a small left margin to separate
+    marginLeft: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // Para Android
+  },
+  pauseButtonSelected: {
+    backgroundColor: '#f0f0f0',
+    borderColor: '#ddd',
+    borderWidth: 1,
+  },
+  pauseButtonText: {
+    marginLeft: 6,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#000',
+  },
+  topControlsRow: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 3,
+  },
 });
