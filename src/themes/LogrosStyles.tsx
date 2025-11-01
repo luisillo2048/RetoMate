@@ -1,322 +1,322 @@
-import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { StyleSheet, Dimensions } from "react-native";
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const isSmallPhone = width < 375;
-const isSmallScreen = width < 375;
 
 export default StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {
-     flexGrow: 1,
-        paddingHorizontal: isSmallScreen ? 12 : 16,
-        paddingTop: Platform.OS === 'ios' ? 50 : 40,
-        paddingBottom: 40, 
-  },
   centered: {
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
-  },
-  lightContainer: {
-    backgroundColor: '#F8F9FA',
-  },
-  darkContainer: {
-    backgroundColor: '#1E3A5F',
   },
 
-  // Textos
-  lightText: {
-    color: '#2C3E50',
-    fontFamily: 'System',
-    fontWeight: '600',
-  },
-  darkText: {
-    color: '#E3F2FD',
-    fontFamily: 'System',
-    fontWeight: '600',
-  },
+  scrollContainer: {
+  flexGrow: 1,
+  justifyContent: 'center',
+  paddingVertical: 20,
+},
 
-  // Encabezado
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: isSmallPhone ? 15 : 20,
-    paddingTop: isSmallPhone ? 5 : 10,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
   headerTextContainer: {
     flex: 1,
-    marginRight: isSmallPhone ? 8 : 12,
   },
   title: {
     fontSize: isSmallPhone ? 24 : 28,
     fontWeight: 'bold',
-    marginBottom: isSmallPhone ? 6 : 8,
-    fontFamily: 'System',
+    marginBottom: 5,
   },
   subtitle: {
     fontSize: isSmallPhone ? 14 : 16,
     opacity: 0.8,
-    fontFamily: 'System',
-    lineHeight: isSmallPhone ? 18 : 20,
   },
   trophyContainer: {
-    padding: isSmallPhone ? 12 : 16,
-    borderRadius: isSmallPhone ? 16 : 20,
-    backgroundColor: 'rgba(79, 195, 247, 0.2)',
-    borderWidth: 2,
-    borderColor: '#4FC3F7',
+    padding: 10,
   },
 
-  // Estadísticas
+  // Stats Container
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: isSmallPhone ? 15 : 20,
-    borderRadius: isSmallPhone ? 16 : 20,
-    marginBottom: isSmallPhone ? 15 : 20,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#4FC3F7',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
+    justifyContent: 'space-between',
+    marginHorizontal: 20,
+    marginVertical: 10,
+    padding: 20,
+    borderRadius: 20,
     elevation: 4,
-    borderWidth: 2,
-    borderColor: '#E3F2FD',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   statItem: {
     alignItems: 'center',
     flex: 1,
   },
   statIcon: {
-    padding: isSmallPhone ? 6 : 8,
-    borderRadius: isSmallPhone ? 10 : 12,
-    marginBottom: isSmallPhone ? 6 : 8,
+    width: isSmallPhone ? 40 : 50,
+    height: isSmallPhone ? 40 : 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   statNumber: {
-    fontSize: isSmallPhone ? 18 : 20,
+    fontSize: isSmallPhone ? 16 : 18,
     fontWeight: 'bold',
-    marginBottom: isSmallPhone ? 3 : 4,
+    marginBottom: 4,
   },
   statLabel: {
-    fontSize: isSmallPhone ? 10 : 12,
-    opacity: 0.8,
-    textAlign: 'center',
+    fontSize: isSmallPhone ? 12 : 14,
+    fontWeight: '500',
   },
 
-  // Lista de logros
+  // Achievement Cards
   achievementsList: {
-    marginBottom: isSmallPhone ? 10 : 15,
+    paddingHorizontal: 15,
+    marginTop: 10,
   },
-
-  // Tarjetas de logros
   achievementCard: {
-    padding: isSmallPhone ? 15 : 20,
-    borderRadius: isSmallPhone ? 16 : 20,
-    marginBottom: isSmallPhone ? 12 : 16,
+    marginVertical: 8,
+    padding: 20,
+    borderRadius: 20,
+    elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-    borderWidth: 3,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  lightCard: {
-    backgroundColor: '#FFFFFF',
-  },
-  darkCard: {
-    backgroundColor: '#283593',
-  },
-  unlockedCard: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#E8F5E8',
-  },
-  lockedCard: {
-    borderColor: '#B0BEC5',
-    backgroundColor: '#FAFAFA',
-  },
-
-  // Encabezado de tarjeta
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: isSmallPhone ? 12 : 16,
+    marginBottom: 15,
+  },
+  textContainer: {
+    flex: 1,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    flex: 1,
   },
   achievementIcon: {
-    fontSize: isSmallPhone ? 28 : 32,
-    marginRight: isSmallPhone ? 10 : 12,
+    fontSize: isSmallPhone ? 24 : 28,
+    marginRight: 12,
     marginTop: 2,
-  },
-  unlockedIcon: {
-    opacity: 1,
-  },
-  lockedIcon: {
-    opacity: 0.6,
-  },
-  textContainer: {
-    flex: 1,
-    marginRight: isSmallPhone ? 10 : 12,
   },
   textContent: {
     flex: 1,
   },
   achievementTitle: {
-    fontSize: isSmallPhone ? 18 : 20,
+    fontSize: isSmallPhone ? 16 : 18,
     fontWeight: 'bold',
-    fontFamily: 'System',
-    marginBottom: isSmallPhone ? 3 : 4,
+    marginBottom: 5,
   },
   achievementDescription: {
-    fontSize: isSmallPhone ? 12 : 14,
-    opacity: 0.8,
-    fontFamily: 'System',
-    lineHeight: isSmallPhone ? 16 : 18,
+    fontSize: isSmallPhone ? 13 : 14,
+    lineHeight: 18,
   },
   iconContainer: {
-    padding: isSmallPhone ? 6 : 8,
-    borderRadius: isSmallPhone ? 10 : 12,
+    marginLeft: 10,
+  },
+
+  // Progress
+  progressContainer: {
+    marginVertical: 10,
+  },
+  progressInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressLabel: {
+    fontSize: isSmallPhone ? 13 : 14,
+    fontWeight: '500',
+  },
+  percentage: {
+    fontSize: isSmallPhone ? 13 : 14,
+    fontWeight: 'bold',
+  },
+  progressBar: {
+    height: 12,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#FFD700',
+    borderRadius: 6,
+  },
+
+  // Unlocked State
+  unlockedProgress: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    padding: 12,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  unlockedText: {
+    fontSize: isSmallPhone ? 14 : 16,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginLeft: 8,
+  },
+
+  // Points
+  pointsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  pointsText: {
+    fontSize: isSmallPhone ? 13 : 14,
+    fontWeight: '500',
+    marginLeft: 6,
+  },
+  pointsStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 8,
+  },
+  pointsStatusText: {
+    fontSize: isSmallPhone ? 12 : 13,
+    marginLeft: 6,
+    flex: 1,
+  },
+
+  // Unlock Date
+  unlockDate: {
+    fontSize: isSmallPhone ? 12 : 13,
+    marginTop: 10,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+
+  // Empty State
+  emptyState: {
+    padding: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
+  emptyIcon: {
+    fontSize: 50,
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: isSmallPhone ? 18 : 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  emptyDescription: {
+    fontSize: isSmallPhone ? 14 : 16,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 15,
+  },
+  emptyHint: {
+    fontSize: isSmallPhone ? 12 : 13,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
+
+  // Info Card
+  infoCard: {
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 20,
+    borderRadius: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  infoTitle: {
+    fontSize: isSmallPhone ? 16 : 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  infoList: {
+    gap: 12,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  infoText: {
+    fontSize: isSmallPhone ? 13 : 14,
+    marginLeft: 10,
+    flex: 1,
+    lineHeight: 18,
+  },
+
+  // Bottom Spacer
+  bottomSpacer: {
+    height: 30,
+  },
+
+  // Theme Styles (se mantienen por compatibilidad)
+  lightContainer: {
+    backgroundColor: '#F5F5F5',
+  },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
+  lightCard: {
+    backgroundColor: '#FFF',
+  },
+  darkCard: {
+    backgroundColor: '#1E1E1E',
+  },
+  lightText: {
+    color: '#333',
+  },
+  darkText: {
+    color: '#FFF',
+  },
+  lightProgressBar: {
+    backgroundColor: '#E0E0E0',
+  },
+  darkProgressBar: {
+    backgroundColor: '#333',
+  },
+  unlockedCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+  },
+  lockedCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#90A4AE',
+  },
+  unlockedIcon: {
+    color: '#4CAF50',
+  },
+  lockedIcon: {
+    color: '#90A4AE',
   },
   unlockedIconContainer: {
     backgroundColor: 'rgba(76, 175, 80, 0.1)',
   },
   lockedIconContainer: {
-    backgroundColor: 'rgba(176, 190, 197, 0.1)',
-  },
-
-  unlockedProgress: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    padding: isSmallPhone ? 10 : 12,
-    borderRadius: isSmallPhone ? 12 : 15,
-    marginBottom: isSmallPhone ? 10 : 12,
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-  },
-  unlockedText: {
-    fontSize: isSmallPhone ? 14 : 16,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    marginLeft: isSmallPhone ? 6 : 8,
-    fontFamily: 'System',
-  },
-
-  // Progreso bloqueado
-  progressContainer: {
-    marginBottom: isSmallPhone ? 10 : 12,
-  },
-  progressInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: isSmallPhone ? 6 : 8,
-  },
-  progressLabel: {
-    fontSize: isSmallPhone ? 12 : 14,
-    fontWeight: '600',
-    fontFamily: 'System',
-  },
-  percentage: {
-    fontSize: isSmallPhone ? 12 : 14,
-    fontWeight: 'bold',
-    fontFamily: 'System',
-    color: '#4FC3F7',
-  },
-  progressBar: {
-    height: isSmallPhone ? 10 : 12,
-    borderRadius: isSmallPhone ? 5 : 6,
-    overflow: 'hidden',
-    borderWidth: 1,
-  },
-  lightProgressBar: {
-    backgroundColor: '#E0E0E0',
-    borderColor: '#BDBDBD',
-  },
-  darkProgressBar: {
-    backgroundColor: '#37474F',
-    borderColor: '#546E7A',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: isSmallPhone ? 4 : 5,
-    backgroundColor: '#4FC3F7',
-  },
-
-  // Puntos
-  pointsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(79, 195, 247, 0.1)',
-    padding: isSmallPhone ? 6 : 8,
-    borderRadius: isSmallPhone ? 8 : 10,
-    marginBottom: isSmallPhone ? 6 : 8,
-  },
-  pointsText: {
-    fontSize: isSmallPhone ? 12 : 14,
-    fontWeight: '600',
-    marginLeft: isSmallPhone ? 4 : 6,
-    fontFamily: 'System',
-  },
-
-  // Fecha de desbloqueo
-  unlockDate: {
-    fontSize: isSmallPhone ? 10 : 12,
-    textAlign: 'center',
-    fontWeight: '500',
-    fontFamily: 'System',
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
-    padding: isSmallPhone ? 4 : 6,
-    borderRadius: isSmallPhone ? 6 : 8,
-  },
-
-  // Estados vacíos
-  emptyState: {
-    alignItems: 'center',
-    padding: isSmallPhone ? 25 : 40,
-    borderRadius: isSmallPhone ? 16 : 20,
-    borderWidth: 3,
-    borderColor: '#4FC3F7',
-    marginTop: isSmallPhone ? 15 : 20,
-    marginBottom: isSmallPhone ? 20 : 30,
-  },
-  emptyIcon: {
-    fontSize: isSmallPhone ? 40 : 50,
-    marginBottom: isSmallPhone ? 12 : 16,
-  },
-  emptyTitle: {
-    fontSize: isSmallPhone ? 18 : 22,
-    fontWeight: 'bold',
-    marginBottom: isSmallPhone ? 8 : 12,
-    textAlign: 'center',
-    fontFamily: 'System',
-  },
-  emptyDescription: {
-    fontSize: isSmallPhone ? 14 : 16,
-    textAlign: 'center',
-    opacity: 0.8,
-    fontFamily: 'System',
-    lineHeight: isSmallPhone ? 18 : 22,
-    marginBottom: isSmallPhone ? 8 : 12,
-  },
-  emptyHint: {
-    fontSize: isSmallPhone ? 12 : 14,
-    textAlign: 'center',
-    opacity: 0.6,
-    fontFamily: 'System',
-    fontStyle: 'italic',
-  },
-
-  bottomSpacer: {
-    height: isSmallPhone ? 30 : 50,
+    backgroundColor: 'rgba(144, 164, 174, 0.1)',
   },
 });
