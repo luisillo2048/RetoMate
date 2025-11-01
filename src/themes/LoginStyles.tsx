@@ -1,57 +1,53 @@
-import { StyleSheet } from "react-native";
+// themes/LoginStyles.tsx
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
-      container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#87CEEB'
-    },
     card: {
-        width: '85%',
-        backgroundColor: '#ffffffff',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderRadius: 20,
         padding: 25,
-        zIndex: 1,
-        elevation: 10,
+        width: width * 0.85,
+        maxWidth: 400,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        elevation: 8,
+        zIndex: 1,
     },
     logo: {
-        width: 150,
-        height: 150,
+        width: 120,
+        height: 120,
         alignSelf: 'center',
         marginBottom: 20,
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 20,
         textAlign: 'center',
+        marginBottom: 30,
         color: '#333',
     },
-    input: {
-        height: 50,
-        borderColor: '#FFD166',
-        borderWidth: 1,
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        marginBottom: 15,
-        backgroundColor: '#ffd1667e',
-    },
-    button: {
-        backgroundColor: '#FF9F1C',
-        padding: 15,
-        borderRadius: 10,
+    inputContainer: {
+        flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 10,
+        marginBottom: 15,
+        position: 'relative',
+    },
+    inputIcon: {
+        position: 'absolute',
+        left: 15,
+        zIndex: 2,
     },
     buttonText: {
-        color: 'white',
+        fontSize: 18,
         fontWeight: 'bold',
-        fontSize: 16,
+        textAlign: 'center',
     },
     footer: {
         flexDirection: 'row',
@@ -59,11 +55,11 @@ export default StyleSheet.create({
         marginTop: 20,
     },
     footerText: {
+        fontSize: 16,
         color: '#666',
     },
     footerLink: {
-        color: '#4a90e2',
+        fontSize: 16,
         fontWeight: 'bold',
     },
-
 });
