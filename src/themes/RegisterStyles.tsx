@@ -1,21 +1,11 @@
 import { StyleSheet, Platform } from "react-native";
 
 export default StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: Platform.OS === 'web' ? '100vh' : '100%',
-  },
-  container: {
-    flex: 1,
-    width: '100%',
-  },
   lightContainer: {
-    backgroundColor: '#87CEEB', // Celeste claro
+    backgroundColor: 'transparent', 
   },
   darkContainer: {
-    backgroundColor: '#87CEEB', // Azul oscuro
+    backgroundColor: 'transparent', 
   },
   bubblesContainer: {
     pointerEvents: 'none',
@@ -25,7 +15,7 @@ export default StyleSheet.create({
     width: Platform.OS === 'web' ? '40%' : '90%',
     minWidth: Platform.OS === 'web' ? 400 : '90%',
     maxWidth: 500,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.92)', 
     borderRadius: 20,
     padding: 25,
     marginVertical: 20,
@@ -70,32 +60,6 @@ export default StyleSheet.create({
     left: 15,
     zIndex: 1,
   },
-  input: {
-    flex: 1,
-    paddingLeft: 50,
-    paddingRight: 15,
-    paddingVertical: 12,
-    borderRadius: 15,
-    borderWidth: 2,
-    borderColor: '#FFD166',
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#FFF9F2',
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 15,
-    borderRadius: 15,
-    marginTop: 20,
-    backgroundColor: '#FF9F1C',
-    shadowColor: '#FF9F1C',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
-  },
   buttonText: {
     color: 'white',
     fontSize: 18,
@@ -123,8 +87,7 @@ export default StyleSheet.create({
     marginLeft: 5,
     textDecorationLine: Platform.OS === 'web' ? 'underline' : 'none',
   },
-
-   pickerContainer: {
+  pickerContainer: {
     flex: 1,
     paddingLeft: 50,
     paddingRight: 15,
