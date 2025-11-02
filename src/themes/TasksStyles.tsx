@@ -37,10 +37,8 @@ const TasksStyles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
-    color: '#2D3748',
   },
   progressContainer: {
-    backgroundColor: '#FFF',
     padding: isSmallScreen ? 16 : 20,
     borderRadius: 16,
     marginBottom: 20,
@@ -54,14 +52,12 @@ const TasksStyles = StyleSheet.create({
     fontSize: isSmallScreen ? 16 : 18,
     fontWeight: '600',
     marginBottom: 8,
-    color: '#2D3748',
   },
   progressPercentage: {
     fontSize: isSmallScreen ? 14 : 16,
     fontWeight: 'bold',
     textAlign: 'right',
     marginTop: 8,
-    color: '#4A5568',
   },
   bloqueContainer: {
     marginBottom: 16,
@@ -82,7 +78,6 @@ const TasksStyles = StyleSheet.create({
   progresoTexto: {
     fontSize: isSmallScreen ? 12 : 14,
     marginTop: 8,
-    color: '#4A5568',
   },
   iniciarBloqueButton: {
     paddingVertical: isSmallScreen ? 10 : 12,
@@ -97,25 +92,29 @@ const TasksStyles = StyleSheet.create({
     color: '#FFF',
   },
   tareaContainer: {
-    backgroundColor: '#FFF',
-    padding: isSmallScreen ? 14 : 16,
-    borderRadius: 10,
-    marginTop: 8,
-    marginHorizontal: 4,
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 16,
+    borderLeftWidth: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   tareaCompletada: {
-    opacity: 0.8,
+    opacity: 0.9,
   },
   tareaHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 13,
   },
   tareaPregunta: {
     flex: 1,
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#2D3748',
     marginRight: 8,
   },
   tareaFooter: {
@@ -129,7 +128,6 @@ const TasksStyles = StyleSheet.create({
   },
   tareaPuntaje: {
     fontSize: isSmallScreen ? 12 : 14,
-    color: '#4A5568',
     marginLeft: 4,
   },
   tareaDificultad: {
@@ -144,7 +142,6 @@ const TasksStyles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   contadorOportunidades: {
-    backgroundColor: '#FFF3CD',
     padding: isSmallScreen ? 10 : 12,
     borderRadius: 8,
     marginBottom: 16,
@@ -154,7 +151,6 @@ const TasksStyles = StyleSheet.create({
   contadorTexto: {
     fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '600',
-    color: '#856404',
     textAlign: 'center',
   },
   tareaHeaderContainer: {
@@ -170,7 +166,6 @@ const TasksStyles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#4B3F2F',
     marginLeft: 4,
   },
   tareaInfo: {
@@ -178,7 +173,6 @@ const TasksStyles = StyleSheet.create({
     alignItems: 'center',
   },
   bloqueBadge: {
-    backgroundColor: '#E2E8F0',
     paddingHorizontal: isSmallScreen ? 10 : 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -187,7 +181,6 @@ const TasksStyles = StyleSheet.create({
   bloqueText: {
     fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '600',
-    color: '#4A5568',
   },
   difficultyBadge: {
     paddingHorizontal: isSmallScreen ? 10 : 12,
@@ -203,14 +196,12 @@ const TasksStyles = StyleSheet.create({
   mensajeEspecialContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF3CD',
     padding: isSmallScreen ? 12 : 16,
     borderRadius: 8,
     marginBottom: 16,
   },
   mensajeEspecialText: {
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#856404',
     marginLeft: 8,
     flex: 1,
   },
@@ -229,7 +220,6 @@ const TasksStyles = StyleSheet.create({
     flex: 1,
     fontSize: isSmallScreen ? 18 : 20,
     fontWeight: '600',
-    color: '#2D3748',
     marginRight: 12,
   },
   audioButtonsContainer: {
@@ -243,7 +233,6 @@ const TasksStyles = StyleSheet.create({
   },
   audioButtonText: {
     fontSize: 10,
-    color: '#4A5568',
     marginTop: 4,
   },
   optionsContainer: {
@@ -260,7 +249,6 @@ const TasksStyles = StyleSheet.create({
   optionText: {
     flex: 1,
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#2D3748',
   },
   selectedOptionText: {
     color: '#FFF',
@@ -284,13 +272,11 @@ const TasksStyles = StyleSheet.create({
   },
   loadingText: {
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#4A5568',
     marginTop: 8,
   },
   feedbackContainer: {
     alignItems: 'center',
     padding: isSmallScreen ? 20 : 24,
-    backgroundColor: '#FFF',
     borderRadius: 16,
     marginTop: 10,
     shadowColor: '#000',
@@ -307,7 +293,6 @@ const TasksStyles = StyleSheet.create({
   },
   correctAnswerText: {
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#4A5568',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -331,12 +316,10 @@ const TasksStyles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 16,
-    color: '#2D3748',
   },
   subText: {
     fontSize: isSmallScreen ? 16 : 18,
     textAlign: 'center',
-    color: '#4A5568',
     marginBottom: 30,
   },
   homeButton: {
@@ -359,7 +342,6 @@ const TasksStyles = StyleSheet.create({
     paddingHorizontal: isSmallScreen ? 16 : 20,
   },
   modalContainer: {
-    backgroundColor: '#FFF',
     borderRadius: 16,
     padding: isSmallScreen ? 20 : 24,
     width: '100%',
@@ -379,7 +361,6 @@ const TasksStyles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 12,
-    color: '#2D3748',
   },
   modalBody: {
     marginBottom: 24,
@@ -387,7 +368,6 @@ const TasksStyles = StyleSheet.create({
   modalText: {
     fontSize: isSmallScreen ? 16 : 18,
     textAlign: 'center',
-    color: '#4A5568',
     marginBottom: 16,
   },
   modalInfoContainer: {
@@ -397,11 +377,9 @@ const TasksStyles = StyleSheet.create({
     marginBottom: 12,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
   },
   modalInfoLabel: {
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#4A5568',
   },
   modalInfoValue: {
     fontSize: isSmallScreen ? 14 : 16,
@@ -419,12 +397,10 @@ const TasksStyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
     padding: 12,
-    backgroundColor: '#F7FAFC',
     borderRadius: 8,
   },
   benefitText: {
     fontSize: isSmallScreen ? 14 : 16,
-    color: '#4A5568',
     marginLeft: 12,
     flex: 1,
   },
@@ -446,6 +422,85 @@ const TasksStyles = StyleSheet.create({
     color: '#FFF',
     marginLeft: 8,
   },
+  tareaEstado: {
+    marginTop: 8,
+  },
+  estadoText: {
+    fontSize: 13,
+    fontWeight: '500',
+    fontStyle: 'italic',
+  },
+
+  confettiContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  position: 'absolute',
+  top: -30,
+  left: 0,
+  right: 0,
+},
+
+confetti: {
+  fontSize: 24,
+  marginHorizontal: 5,
+},
+
+logroContent: {
+  alignItems: 'center',
+  marginBottom: 20,
+},
+logroIcon: {
+  marginBottom: 10,
+},
+
+logroName: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  textAlign: 'center',
+  marginBottom: 8,
+},
+logroDescription: {
+  fontSize: 16,
+  textAlign: 'center',
+  lineHeight: 22,
+},
+progressBarContainer: {
+  marginTop: 20,
+},
+progressBar: {
+  height: 8,
+  borderRadius: 4,
+  marginBottom: 8,
+  overflow: 'hidden',
+},
+progressFill: {
+  height: '100%',
+  width: '100%',
+  borderRadius: 4,
+},
+progressText: {
+  fontSize: 14,
+  textAlign: 'center',
+  fontWeight: '500',
+},
+celebrateButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 16,
+  paddingHorizontal: 24,
+  borderRadius: 12,
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.3,
+  shadowRadius: 8,
+  elevation: 6,
+  gap: 8,
+},
+celebrateButtonText: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#FFF',
+}, 
 });
 
 export default TasksStyles;
