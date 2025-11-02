@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { Tarea } from '../types';
+import { Tarea } from '../types/tarea';
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Image, Animated, StyleSheet } from "react-native";
+import { View, Animated, StyleSheet } from "react-native";
 import { useAppSettings } from "../context/AppSettingsContext";
 
 const burbujaImage = require("../../assets/images/animacionRegister.png");

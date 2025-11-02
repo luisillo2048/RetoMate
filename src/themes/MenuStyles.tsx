@@ -269,7 +269,7 @@ const MenuStyles = StyleSheet.create({
   },
   chatBotButton: {
     position: "absolute",
-    bottom: 130, // Posicionado más arriba
+    bottom: 130, 
     right: 20,
     alignItems: "center",
     zIndex: 1000,

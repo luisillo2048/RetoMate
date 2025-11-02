@@ -82,7 +82,7 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({
                 </View>
 
                 <View style={styles.pointItem}>
-                  <Ionicons name="robot" size={20} color="#96CEB4" />
+                  <Ionicons name="hardware-chip" size={20} color="#96CEB4" />
                   <Text style={[styles.pointText, { color: colors.text }]}>
                     <Text style={styles.bold}>Asistente IA:</Text> Te ayudará cuando lo necesites 🤖
                   </Text>

@@ -10,8 +10,8 @@ interface ProfileHeaderProps {
   bounceAnim: Animated.Value;
   slideAnim: Animated.Value;
   fadeAnim: Animated.Value;
-  logoSpinInterpolate: Animated.AnimatedInterpolation;
-  balloonTranslateY: Animated.AnimatedInterpolation;
+  logoSpinInterpolate: Animated.AnimatedInterpolation<string>;
+  balloonTranslateY: Animated.AnimatedInterpolation<string>;
 }
 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({

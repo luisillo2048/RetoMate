@@ -10,7 +10,7 @@ interface PointsCardProps {
   bounceAnim: Animated.Value;
   slideAnim: Animated.Value;
   fadeAnim: Animated.Value;
-  rotateInterpolate: Animated.AnimatedInterpolation;
+  rotateInterpolate: Animated.AnimatedInterpolation<string>;
   totalPuntaje: number;
   spentPoints: number;
   availablePoints: number;

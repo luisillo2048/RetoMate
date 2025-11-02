@@ -4,23 +4,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Theme = 'light' | 'dark';
 
-// Colores aptos para niños de primer grado
 const childFriendlyColors = {
   light: {
-    primary: '#4A90E2', // Azul suave
-    secondary: '#9B6BCC', // Morado suave
-    accent: '#FF8C42', // Naranja suave
-    background: ['#6DD5FA', '#4A90E2', '#9B6BCC'], // Gradiente azul-morado
+    primary: '#4A90E2', 
+    secondary: '#9B6BCC', 
+    accent: '#FF8C42', 
+    background: ['#6DD5FA', '#4A90E2', '#9B6BCC'], 
     text: '#2D3748',
     card: '#FFFFFF',
+    border: '#E2E8F0',
+    shadow: '#2D3748',
+    
   },
   dark: {
-    primary: '#5FA8FF', // Azul más claro para contraste
-    secondary: '#B18CFF', // Morado más claro
-    accent: '#FF9E5F', // Naranja más claro
-    background: ['#1E3A8A', '#6D28D9', '#9B6BCC'], // Gradiente azul oscuro-morado
+    primary: '#5FA8FF', 
+    secondary: '#B18CFF', 
+    accent: '#FF9E5F', 
+    background: ['#1E3A8A', '#6D28D9', '#9B6BCC'], 
     text: '#F7FAFC',
     card: '#2D3748',
+    border: '#4A5568',
+    shadow: '#000000',
   }
 };
 

@@ -1,12 +1,12 @@
 import React from "react";
-import { View, Text, Image, Animated } from "react-native";
+import { Text, Image, Animated } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from "../context/ThemeContext";
 import styles from "../themes/ProfileStyles";
 
 interface LoadingScreenProps {
   bounceAnim: Animated.Value;
-  logoSpinInterpolate: Animated.AnimatedInterpolation;
+  logoSpinInterpolate: Animated.AnimatedInterpolation<string>; 
 }
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({
@@ -15,8 +15,10 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const gradientColors = ['#4c669f', '#3b5998', '#192f6a'] as const;
+
   return (
-    <LinearGradient colors={colors.background} style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <Animated.View style={{ 
         transform: [
           { scale: bounceAnim },

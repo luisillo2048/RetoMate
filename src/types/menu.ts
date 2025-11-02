@@ -1,4 +1,3 @@
-// Agregar estas interfaces al archivo types existente
 export interface EducationalContent {
   title: string;
   description: string;

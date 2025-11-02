@@ -6,7 +6,7 @@ import MenuScreen from "../screens/MenuScreen";
 import GamesScreen from "../screens/GamesScreen";
 import TasksScreen from "../screens/TasksScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import AchievementsScreen from "../screens/AchievementsScreen";
+import AchievementsScreen from "../screens/ArchievementsScreen";
 import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();

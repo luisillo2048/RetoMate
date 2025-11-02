@@ -5,12 +5,22 @@ export default {
     name: "RetoMate",
     slug: "retomate",
     version: "2.0.0",
+
+    
+    updates: {
+      url: "https://u.expo.dev/99f8314e-850f-4c55-a9ce-768a8c78c1e0"
+    },
+
+    runtimeVersion: {
+      policy: "appVersion"
+    },
+
     orientation: "portrait",
-    icon: "./assets/images/logo2.png",
+    icon: "./assets/images/Logo.png",
     userInterfaceStyle: "light",
     newArchEnabled: true,
     splash: {
-      image: "./assets/images/logo2.png",
+      image: "./assets/images/Logo.png",
       resizeMode: "contain",
       backgroundColor: "#c16060ff"
     },
@@ -19,19 +29,19 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/logo2.png",
+        foregroundImage: "./assets/images/Logo.png",
         backgroundColor: "#ffffff"
       },
       edgeToEdgeEnabled: true,
       package: "com.anonymous.frontendretomate"
     },
     web: {
-      favicon: "./assets/images/logo2.png"
+      favicon: "./assets/images/Logo.png"
     },
     extra: {
       API_URL: process.env.EXPO_PUBLIC_API_URL,
       eas: {
-        projectId: "3a393d5a-2c52-4dfd-84ac-343182c86f46"
+        projectId: "99f8314e-850f-4c55-a9ce-768a8c78c1e0"
       }
     }
   }

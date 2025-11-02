@@ -3,16 +3,9 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import Constants from "expo-constants"; // <--- 1. IMPORTA CONSTANTS
+import Constants from "expo-constants"; 
 
-// 2. LEE LA URL DE LA FORMA CORRECTA. ESTA ES LA LÍNEA CLAVE.
 const API_URL = Constants.expoConfig?.extra?.API_URL;
-
-// 3. (OPCIONAL PERO RECOMENDADO) UNA VERIFICACIÓN PARA ESTAR SEGUROS
-console.log('LA URL QUE ESTÁ USANDO LA APP ES:', API_URL); 
-if (!API_URL) {
-  alert("ALERTA: La URL de la API no se ha cargado. Revisa la configuración.");
-}
 
 interface User {
   id: string;
@@ -46,7 +39,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       
-      // Ahora esta llamada usará la URL correcta leída desde Constants
       const response = await axios.get(`${API_URL}/auth/me`);
 
       const userData = response.data;

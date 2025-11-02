@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
+import { View, 
   Text, 
   TouchableOpacity, 
   ScrollView, 
@@ -17,7 +16,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
+import styles from '../themes/GameStyles';
+import { globalStyles } from "../themes/globalStyles";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Game {
@@ -42,7 +44,8 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const MathGamesScreen = () => {
   const navigation = useNavigation();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
+  const { theme, colors } = useTheme(); // Usar el contexto de tema
   const [activeCategory, setActiveCategory] = useState('sumas');
   const [userPoints, setUserPoints] = useState(0);
   const [unlockedGames, setUnlockedGames] = useState<string[]>([]);
@@ -50,38 +53,45 @@ const MathGamesScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
   // CLAVES PARA GUARDAR DATOS
   const PURCHASED_GAMES_KEY = `purchased_games_${user?.id || 'guest'}`;
 
   // CARGAR PUNTOS Y JUEGOS COMPRADOS
   useEffect(() => {
     loadUserData();
-  }, [user, token]);
+  }, [user]);
 
   const loadUserData = async () => {
     await loadUserPoints();
     await loadPurchasedGames();
   };
 
-  // CARGAR PUNTOS REALES DEL USUARIO
+  // CARGAR PUNTOS REALES DEL USUARIO - CORREGIDO
   const loadUserPoints = async () => {
     try {
       setLoading(true);
       
-      // Si no hay usuario o token, usar puntos locales
-      if (!user?.id || !token) {
+      // Si no hay usuario, usar puntos locales
+      if (!user?.id) {
         const localPoints = await getLocalPoints();
         setUserPoints(localPoints);
         return;
       }
 
-      const API_URL = 'https://api-node-js-production.up.railway.app';
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        const localPoints = await getLocalPoints();
+        setUserPoints(localPoints);
+        return;
+      }
       
       const response = await axios.get(
-        `${API_URL}/api/progreso/progreso/${user.id}`,
+        `${apiUrl}/progreso/progreso/${user.id}`,
         { 
           headers: { Authorization: `Bearer ${token}` },
-          timeout: 10000 // 10 segundos timeout
+          timeout: 10000
         }
       );
       
@@ -99,8 +109,11 @@ const MathGamesScreen = () => {
       const currentPoints = Math.max(0, totalPuntosFromAPI - spent);
       setUserPoints(currentPoints);
       
+      // Actualizar puntos locales
+      await saveLocalPoints(currentPoints);
+      
     } catch (error: any) {
-      console.log('Usando puntos locales (API no disponible)');
+      console.log('Usando puntos locales (API no disponible):', error.message);
       // En caso de error, usar puntos locales
       const localPoints = await getLocalPoints();
       setUserPoints(localPoints);
@@ -257,31 +270,31 @@ const MathGamesScreen = () => {
     Animated.loop(bounce).start();
   }, []);
 
-  // JUEGOS CON PRECIOS EN PUNTOS
+  // JUEGOS CON PRECIOS EN PUNTOS - Actualizados con colores del tema
   const categories: Category[] = [
     { 
       id: 'sumas', 
       name: 'Sumas', 
       icon: 'plus-circle',
-      color: '#FF6B6B'
+      color: colors.primary
     },
     { 
       id: 'restas', 
       name: 'Restas', 
       icon: 'minus-circle',
-      color: '#4ECDC4'
+      color: colors.secondary
     },
     { 
       id: 'multiplicar', 
       name: 'Multiplicar', 
       icon: 'close-circle',
-      color: '#FFA500'
+      color: colors.accent
     },
     { 
       id: 'aventura', 
       name: 'Aventura', 
       icon: 'rocket-launch',
-      color: '#BA68C8'
+      color: colors.primary
     }
   ];
 
@@ -436,19 +449,26 @@ const MathGamesScreen = () => {
       ]}
     >
       <LinearGradient
-        colors={['#FFD700', '#FF6B00']}
+        colors={[colors.primary, colors.secondary]}
         style={styles.pointsGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
         <View style={styles.pointsContent}>
-          <FontAwesome5 name="coins" size={28} color="#FFF" />
+          <View style={styles.coinsContainer}>
+            <FontAwesome5 name="coins" size={32} color="#FFF" />
+            <View style={styles.sparkle}>
+              <Text style={styles.sparkleText}>✨</Text>
+            </View>
+          </View>
           <View style={styles.pointsTextContainer}>
-            <Text style={styles.pointsLabel}>MIS PUNTOS</Text>
+            <Text style={styles.pointsLabel}>MIS TESOROS</Text>
             <Text style={styles.pointsValue}>
-              {loading ? 'Cargando...' : `${userPoints} PUNTOS 💎`}
+              {loading ? 'Cargando...' : `${userPoints} PUNTOS MÁGICOS`}
             </Text>
           </View>
-          <TouchableOpacity onPress={onRefresh}>
-            <Ionicons name="refresh" size={28} color="#FFF" />
+          <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
+            <Ionicons name="refresh-circle" size={36} color="#FFF" />
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -477,72 +497,92 @@ const MathGamesScreen = () => {
           </View>
         )}
 
-        <Image source={game.image} style={styles.gameImage} />
-        
-        <View style={styles.gameInfo}>
-          <Text style={styles.gameTitle}>{game.title}</Text>
-          <Text style={styles.gameDescription}>{game.description}</Text>
+        {/* BADGE GRATIS */}
+        {isFree && !isPurchased && (
+          <View style={styles.freeBadge}>
+            <Text style={styles.freeBadgeText}>🎁 GRATIS</Text>
+          </View>
+        )}
+
+        <LinearGradient
+          colors={['#FFFFFF', '#F8F9FA']}
+          style={styles.gameCardGradient}
+        >
+          <Image source={game.image} style={styles.gameImage} />
           
-          <View style={styles.gameFooter}>
-            <View style={[
-              styles.difficultyTag,
-              { backgroundColor: 
-                game.difficulty === 'Fácil' ? '#4CAF50' :
-                game.difficulty === 'Medio' ? '#FF9800' : '#F44336'
-              }
-            ]}>
-              <Text style={styles.difficultyText}>{game.difficulty}</Text>
-            </View>
+          <View style={styles.gameInfo}>
+            <Text style={styles.gameTitle}>{game.title}</Text>
+            <Text style={styles.gameDescription}>{game.description}</Text>
             
-            <View style={styles.pointsContainer}>
-              {isFree ? (
-                <Text style={styles.freeText}>GRATIS 🎁</Text>
-              ) : isPurchased ? (
-                <Text style={styles.purchasedText}>✅ TUYO</Text>
-              ) : (
-                <>
-                  <FontAwesome5 name="coins" size={16} color="#FFD700" />
-                  <Text style={styles.pointsCostText}>{game.pointsRequired} pts</Text>
-                </>
-              )}
+            <View style={styles.gameFooter}>
+              <View style={[
+                styles.difficultyTag,
+                { backgroundColor: 
+                  game.difficulty === 'Fácil' ? '#4CAF50' :
+                  game.difficulty === 'Medio' ? '#FF9800' : '#F44336'
+                }
+              ]}>
+                <Text style={styles.difficultyText}>{game.difficulty}</Text>
+              </View>
+              
+              <View style={styles.pointsContainer}>
+                {isFree ? (
+                  <Text style={styles.freeText}>GRATIS 🎁</Text>
+                ) : isPurchased ? (
+                  <Text style={styles.purchasedText}>✅ TUYO</Text>
+                ) : (
+                  <>
+                    <FontAwesome5 name="coins" size={18} color="#FFD700" />
+                    <Text style={styles.pointsCostText}>{game.pointsRequired} pts</Text>
+                  </>
+                )}
+              </View>
             </View>
-          </View>
 
-          {/* BOTÓN QUE CAMBIA SEGÚN EL ESTADO */}
-          <View style={[
-            styles.actionButton,
-            isPurchased && styles.playButton,
-            (isFree && !isPurchased) && styles.freeButton,
-            (!canBuy && !isFree && !isPurchased) && styles.lockedButton,
-            !user && styles.disabledButton
-          ]}>
-            <Text style={styles.actionButtonText}>
-              {!user ? 'INICIA SESIÓN 🔒' :
-               isPurchased ? 'JUGAR AHORA 🚀' : 
-               isFree ? 'JUGAR GRATIS 🎮' : 
-               canBuy ? 'COMPRAR Y JUGAR ✅' : 'BLOQUEADO 🔒'}
-            </Text>
-            <Ionicons 
-              name={isPurchased ? "play-circle" : "game-controller"} 
-              size={20} 
-              color="#FFF" 
-            />
-          </View>
+            {/* BOTÓN QUE CAMBIA SEGÚN EL ESTADO */}
+            <LinearGradient
+              colors={
+                !user ? ['#CCCCCC', '#999999'] :
+                isPurchased ? [colors.accent, colors.primary] :
+                isFree ? ['#FF9800', '#F57C00'] :
+                canBuy ? [colors.primary, colors.secondary] : ['#757575', '#616161']
+              }
+              style={[
+                styles.actionButton,
+                !user && styles.disabledButton
+              ]}
+            >
+              <Text style={styles.actionButtonText}>
+                {!user ? 'INICIA SESIÓN 🔒' :
+                isPurchased ? 'JUGAR AHORA 🚀' : 
+                isFree ? 'JUGAR GRATIS 🎮' : 
+                canBuy ? 'COMPRAR Y JUGAR ✅' : 'BLOQUEADO 🔒'}
+              </Text>
+              <Ionicons 
+                name={isPurchased ? "play-circle" : "game-controller"} 
+                size={22} 
+                color="#FFF" 
+              />
+            </LinearGradient>
 
-          {/* MENSAJE DE BLOQUEADO */}
-          {!canBuy && !isFree && !isPurchased && user && (
-            <View style={styles.lockedOverlay}>
-              <Ionicons name="lock-closed" size={16} color="#FFF" />
-              <Text style={styles.lockedText}>{getLockedMessage(game.pointsRequired)}</Text>
-            </View>
-          )}
-        </View>
+            {/* MENSAJE DE BLOQUEADO */}
+            {!canBuy && !isFree && !isPurchased && user && (
+              <View style={styles.lockedOverlay}>
+                <Ionicons name="lock-closed" size={18} color="#FFF" />
+                <Text style={styles.lockedText}>{getLockedMessage(game.pointsRequired)}</Text>
+              </View>
+            )}
+          </View>
+        </LinearGradient>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={colors.background}
+      style={globalStyles.container}
+    >
       {/* HEADER CON PUNTOS */}
       {user && renderPointsHeader()}
 
@@ -554,23 +594,40 @@ const MathGamesScreen = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#FFD700']}
-            tintColor="#FFD700"
+            colors={[colors.primary, colors.secondary]}
+            tintColor={colors.primary}
           />
         }
       >
         {!user ? (
           <View style={styles.noUserContainer}>
-            <Text style={styles.noUserText}>🎮 Inicia sesión para acceder a los juegos</Text>
-            <Text style={styles.noUserSubText}>
-              Podrás ganar puntos completando tareas y desbloquear juegos emocionantes
-            </Text>
+            <LinearGradient
+              colors={[colors.primary, colors.secondary]}
+              style={styles.noUserGradient}
+            >
+              <Text style={styles.noUserTitle}>🎮 ¡Bienvenido Amiguito! 🎮</Text>
+              <Text style={styles.noUserText}>
+                Inicia sesión para descubrir juegos mágicos de matemáticas
+              </Text>
+              <Text style={styles.noUserSubText}>
+                ¡Gana puntos resolviendo problemas y desbloquea aventuras increíbles!
+              </Text>
+              <View style={styles.emojiContainer}>
+                <Text style={styles.emoji}>🐰 🏎️ 🍎 🚀 🏆</Text>
+              </View>
+            </LinearGradient>
           </View>
         ) : (
           <>
+            {/* TÍTULO PRINCIPAL */}
+            <View style={styles.mainTitleContainer}>
+              <Text style={[styles.mainTitle, { color: colors.primary }]}>🎪 CIRCO MATEMÁGICO 🎪</Text>
+              <Text style={[styles.subTitle, { color: colors.secondary }]}>Elige tu juego favorito</Text>
+            </View>
+
             {/* CATEGORÍAS */}
             <View style={styles.categoriesSection}>
-              <Text style={styles.sectionTitle}>ELIGE TU JUEGO 🎯</Text>
+              <Text style={[styles.sectionTitle, { color: colors.primary }]}>🎯 ELIGE TU AVENTURA</Text>
               <ScrollView 
                 horizontal 
                 showsHorizontalScrollIndicator={false}
@@ -588,16 +645,23 @@ const MathGamesScreen = () => {
                     <LinearGradient
                       colors={activeCategory === category.id ? 
                         [category.color, category.color] : 
-                        ['#666', '#999']
+                        [colors.primary, colors.secondary]
                       }
                       style={styles.categoryGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
                     >
                       <MaterialCommunityIcons 
                         name={category.icon} 
-                        size={32} 
+                        size={36} 
                         color="#FFF" 
                       />
                       <Text style={styles.categoryText}>{category.name}</Text>
+                      {activeCategory === category.id && (
+                        <View style={styles.activeIndicator}>
+                          <Text style={styles.activeIndicatorText}>⭐</Text>
+                        </View>
+                      )}
                     </LinearGradient>
                   </TouchableOpacity>
                 ))}
@@ -606,249 +670,26 @@ const MathGamesScreen = () => {
 
             {/* JUEGOS DE LA CATEGORÍA */}
             <View style={styles.gamesSection}>
-              <Text style={styles.sectionTitle}>
-                JUEGOS DE {categories.find(c => c.id === activeCategory)?.name?.toUpperCase()} 🎮
+              <Text style={[styles.sectionTitle, { color: colors.primary }]}>
+                🎮 JUEGOS DE {categories.find(c => c.id === activeCategory)?.name?.toUpperCase()}
               </Text>
               
-              {exercises[activeCategory]?.map(renderGameCard)}
+              <View style={styles.gamesGrid}>
+                {exercises[activeCategory]?.map(renderGameCard)}
+              </View>
+            </View>
+
+            {/* FOOTER DECORATIVO */}
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: colors.primary }]}>¡Sigue jugando y aprendiendo! 🌟</Text>
+              <Text style={styles.footerEmoji}>🐰 🦊 🐻 🐯 🦁</Text>
             </View>
           </>
         )}
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-  },
-  noUserContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    marginTop: 100,
-  },
-  noUserText: {
-    color: '#FFF',
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  noUserSubText: {
-    color: '#CCC',
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  pointsHeader: {
-    paddingHorizontal: 20,
-    paddingTop: screenHeight * 0.05,
-    paddingBottom: 15,
-    backgroundColor: '#1a1a1a',
-  },
-  pointsGradient: {
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  pointsContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  pointsTextContainer: {
-    flex: 1,
-    marginLeft: 15,
-  },
-  pointsLabel: {
-    color: '#FFF',
-    fontSize: 14,
-    fontWeight: 'bold',
-    opacity: 0.8,
-  },
-  pointsValue: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 30,
-  },
-  categoriesSection: {
-    padding: 20,
-    backgroundColor: '#2a2a2a',
-  },
-  categoriesScrollContent: {
-    paddingRight: 10,
-  },
-  sectionTitle: {
-    color: '#FFF',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  categoryButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginRight: 10,
-    minWidth: screenWidth * 0.28,
-  },
-  activeCategoryButton: {
-    transform: [{ scale: 1.05 }],
-  },
-  categoryGradient: {
-    padding: 15,
-    alignItems: 'center',
-    minWidth: screenWidth * 0.28,
-  },
-  categoryText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginTop: 5,
-    textAlign: 'center',
-  },
-  gamesSection: {
-    padding: 20,
-  },
-  gameCard: {
-    backgroundColor: '#333',
-    borderRadius: 15,
-    marginBottom: 15,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-    position: 'relative',
-  },
-  lockedGameCard: {
-    opacity: 0.7,
-  },
-  purchasedBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    zIndex: 1,
-  },
-  purchasedBadgeText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  gameImage: {
-    width: '100%',
-    height: screenHeight * 0.2,
-  },
-  gameInfo: {
-    padding: 15,
-  },
-  gameTitle: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  gameDescription: {
-    color: '#CCC',
-    fontSize: 14,
-    marginBottom: 10,
-    lineHeight: 20,
-  },
-  gameFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  difficultyTag: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-  },
-  difficultyText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  pointsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-  },
-  freeText: {
-    color: '#4CAF50',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  purchasedText: {
-    color: '#4CAF50',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  pointsCostText: {
-    color: '#FFD700',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#4CAF50',
-    padding: 12,
-    borderRadius: 10,
-    justifyContent: 'center',
-    gap: 10,
-    marginTop: 5,
-  },
-  playButton: {
-    backgroundColor: '#2196F3',
-  },
-  freeButton: {
-    backgroundColor: '#FF9800',
-  },
-  lockedButton: {
-    backgroundColor: '#757575',
-  },
-  disabledButton: {
-    backgroundColor: '#555',
-  },
-  actionButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  lockedOverlay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 0, 0, 0.7)',
-    padding: 8,
-    borderRadius: 8,
-    gap: 8,
-    marginTop: 8,
-    justifyContent: 'center',
-  },
-  lockedText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-  }
-});
 
 export default MathGamesScreen;

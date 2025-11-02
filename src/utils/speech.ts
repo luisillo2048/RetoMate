@@ -1,5 +1,5 @@
 import * as Speech from 'expo-speech';
-import { Tarea } from '../types';
+import { Tarea } from '../types/tarea';
 
 let isSpeaking = false;
 let currentSpeechQueue: string[] = [];

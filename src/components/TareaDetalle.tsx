@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator } fr
 import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import { useTheme } from '../context/ThemeContext';
-import { Tarea } from '../types';
+import { Tarea } from '../types/tarea';
 import { getImageUrl, getDifficultyColor, normalizarDificultad } from '../utils/storage';
 import { leerPregunta, leerOpciones, leerTexto } from '../utils/speech';
 import styles from '../themes/TasksStyles';
@@ -40,19 +40,19 @@ const TareaDetalle = ({
   const dificultadNormalizada = normalizarDificultad(tareaActual.dificultad || 'facil');
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={true}
-      >
-        {erroresConsecutivos > 0 && (
-          <View style={styles.contadorOportunidades}>
-            <Text style={styles.contadorTexto}>
-              Oportunidades restantes: {3 - erroresConsecutivos} ⭐
-            </Text>
-          </View>
-        )}
+<View style={[styles.container, { backgroundColor: colors.background[0] }]}>
+  <ScrollView 
+    style={styles.scrollView}
+    contentContainerStyle={styles.scrollContent}
+    showsVerticalScrollIndicator={true}
+  >
+    {erroresConsecutivos > 0 && (
+      <View style={styles.contadorOportunidades}>
+        <Text style={styles.contadorTexto}>
+          Oportunidades restantes: {3 - erroresConsecutivos} ⭐
+        </Text>
+      </View>
+    )}
 
         <View style={styles.tareaHeaderContainer}>
           <TouchableOpacity 
@@ -126,11 +126,12 @@ const TareaDetalle = ({
             return (
               <View key={index}>
                 <TouchableOpacity
-                  style={[styles.optionButton, { 
-                    backgroundColor,
-                  }]}
+                  style={[styles.optionButton, { backgroundColor }]}
                   disabled={respondido || loading || bloquearOpciones}
-                  onPress={() => onVerificarRespuesta(opcion)}
+                  onPress={() => {
+                    // ✅ validar directamente en un solo clic
+                    onVerificarRespuesta(opcion);
+                  }}
                   onLongPress={() => leerTexto(opcion)}
                 >
                   <Text style={[
@@ -160,7 +161,7 @@ const TareaDetalle = ({
           </View>
         )}
 
-        {respondido && mostrarRespuesta && (
+        {respondido && (
           <View style={styles.feedbackContainer}>
             <Ionicons
               name={correcta ? 'checkmark-circle' : 'close-circle'}
@@ -168,11 +169,15 @@ const TareaDetalle = ({
               color={correcta ? '#4CAF50' : '#F44336'}
             />
             <Text style={styles.feedbackText}>
-              {correcta ? '¡Respuesta Correcta! 🎉' : 'Respuesta Incorrecta 😕'}
+              {correcta ? '¡Respuesta Correcta! 🎉' : 'Intenta otra vez 😕'}
             </Text>
-            <Text style={styles.correctAnswerText}>
-              La respuesta correcta es: {tareaActual.respuestaCorrecta}
-            </Text>
+            
+            {/* SOLO MOSTRAR LA RESPUESTA CORRECTA SI LA RESPUESTA FUE CORRECTA */}
+            {correcta && mostrarRespuesta && (
+              <Text style={styles.correctAnswerText}>
+                La respuesta correcta es: {tareaActual.respuestaCorrecta}
+              </Text>
+            )}
             
             <TouchableOpacity
               style={[styles.nextButton, loading && styles.nextButtonDisabled, {
@@ -191,6 +196,8 @@ const TareaDetalle = ({
             </TouchableOpacity>
           </View>
         )}
+        {/* Espacio extra para asegurar que se pueda scrollear completamente */}
+      <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
   );

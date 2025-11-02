@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Image, Animated } from "react-native";
+import { Image, Animated } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSettings } from "../context/AppSettingsContext";
 import styles from "../themes/Styles";

@@ -1,7 +1,6 @@
 import axios from "axios";
 import Constants from "expo-constants";
 
-// Tomamos la URL de la API desde app.config.js / EAS env
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 if (!apiUrl) {
@@ -16,10 +15,10 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // 10 segundos
+  timeout: 10000, 
 });
 
-// --- Función para login ---
+// --- Login ---
 export const loginUser = async (email: string, password: string) => {
   try {
     const response = await api.post("/auth/login", { email, password });
@@ -30,7 +29,7 @@ export const loginUser = async (email: string, password: string) => {
   }
 };
 
-// --- Función para registro ---
+// --- Registro ---
 export const registerUser = async (
   username: string,
   email: string,
