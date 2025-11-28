@@ -33,7 +33,12 @@ export default {
         backgroundColor: "#ffffff"
       },
       edgeToEdgeEnabled: true,
-      package: "com.anonymous.frontendretomate"
+      package: "com.anonymous.frontendretomate",
+      config: {
+        ndk: {
+          version: "27.0.12077973"
+        }
+      }
     },
     web: {
       favicon: "./assets/images/Logo.png"

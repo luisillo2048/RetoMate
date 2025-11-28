@@ -132,6 +132,46 @@ yarn test
 
 ---
 
+## 📱 Compatibilidad con Android 16KB Page Size
+
+A partir de 2024, Google Play requiere que las aplicaciones soporten dispositivos con páginas de memoria de 16 KB. RetoMate está configurada para cumplir con este requisito.
+
+### Configuración implementada
+
+- **NDK 27.0.12077973**: Configurado en `eas.json` y `app.config.js` para generar builds compatibles
+- **Expo SDK 53**: Compatible con la nueva arquitectura de Android
+
+### Requisitos para builds
+
+Los builds de Android se generan automáticamente con soporte para 16 KB cuando se usa EAS Build:
+
+```bash
+# Build de producción
+eas build --platform android --profile production
+
+# Build de desarrollo
+eas build --platform android --profile development
+
+# Build de preview
+eas build --platform android --profile preview
+```
+
+### Verificación de compatibilidad
+
+Para verificar que el APK/AAB es compatible con 16 KB:
+
+1. Sube el archivo a Google Play Console
+2. Revisa la pestaña "App bundle explorer"
+3. Verifica que no aparezcan advertencias sobre tamaño de página de memoria
+
+### Referencias
+
+- [Android - Prácticas de tamaños de página](https://developer.android.com/guide/practices/page-sizes?hl=es-419)
+- [Blog Android Developers - 16KB page size](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html)
+- [Expo EAS Build Configuration](https://docs.expo.dev/build-reference/android-builds/)
+
+---
+
 ## 🎨 Diseño Inclusivo
 
 RetoMate está diseñada con principios de accesibilidad y neurodiversidad en mente:
